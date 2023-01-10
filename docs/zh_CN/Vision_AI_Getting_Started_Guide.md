@@ -88,3 +88,17 @@ python3 tools/ufconv/uf2conv.py -t 1 -c model.tflite -o model.uf2
 - **第四步：** 一次将 `firmware.uf2` 和 `model.uf2` 文件拖放到GROVEAI驱动器上。
 
 一旦复制完成，**GROVEAI** 驱动器将消失。
+
+## 结果预览
+
+- **Step 1:** 在加载固件并连接到PC后, 打开 [this URL](https://files.seeedstudio.com/grove_ai_vision/index.html)
+
+- **Step 2:** 点击 **Connect** 按钮. 然后你会在浏览器上看到一个弹出窗口. 选择 **Grove AI** 点击 **Connect**
+  
+<div align=center><img width=1000 src="../_static/meter_p1.png"/></div>
+
+- **Step 2:** 配置 **config** 
+
+之后，你可以在网络用户界面上看到实时预览
+
+<div align=center><img width=1000 src="../_static/meter_p2.png"/></div>
