@@ -89,6 +89,7 @@ void main(void)
         hx_drv_webusb_write_vision(jpeg_addr, jpeg_size);
         if (ercode == 0)
         {
+            memset(preview, 0, 1024);
             tflitemicro_algo_get_preview(preview, 1024);
             if (strlen(preview) > 0)
             {

@@ -53,6 +53,7 @@ extern "C" void DebugLog(const char *s) { xprintf("%s", s); } //{ fprintf(stderr
 
 #define MODEL_INDEX 1
 #define ALGORITHM_INDEX 0
+#define CONFIDENCE_THRESHOLD 85
 #define IMG_PREVIEW_MAX_SIZE 10
 #define IMAGE_PREIVEW_ELEMENT_NUM 6
 #define IMAGE_PREIVEW_ELEMENT_SIZE 4
@@ -157,13 +158,14 @@ extern "C" int tflitemicro_algo_run(uint32_t img, uint32_t ow, uint32_t oh)
                     max_target = t;
                 }
             }
-            if (max_conf > 60 && max_target != 0)
+            if (max_conf > CONFIDENCE_THRESHOLD && max_target != 0)
             {
                 fomo_t obj;
                 obj.x = i * ow / n_w - ow / n_w / 2;
                 obj.y = j * oh / n_h - oh / n_h / 2;
                 obj.confidence = max_conf;
                 obj.target = max_target;
+                LOGGER_INFO("[fomo] i:%d j:%d conf:%d target:%d\n", i, j, obj.confidence, obj.target);
                 _fomo_list.emplace_front(obj);
             }
         }
