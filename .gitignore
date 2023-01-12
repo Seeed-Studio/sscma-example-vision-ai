@@ -1,0 +1,10 @@
+# SDK
+himax_we1_sdk/
+obj_socket_24/
+tensorflow/
+third_party/
+tools/
+
+# export format
+*.uf2
+*.tflite
