@@ -53,7 +53,7 @@ extern "C" void DebugLog(const char *s) { xprintf("%s", s); } //{ fprintf(stderr
 
 #define MODEL_INDEX 1
 #define ALGORITHM_INDEX 0
-#define CONFIDENCE_THRESHOLD 85
+#define CONFIDENCE_THRESHOLD 80
 #define IMG_PREVIEW_MAX_SIZE 10
 #define IMAGE_PREIVEW_ELEMENT_NUM 6
 #define IMAGE_PREIVEW_ELEMENT_SIZE 4
@@ -122,8 +122,8 @@ extern "C" int tflitemicro_algo_run(uint32_t img, uint32_t ow, uint32_t oh)
     uint16_t h = input->dims->data[1];
     uint16_t w = input->dims->data[2];
     uint16_t c = input->dims->data[3];
-    uint16_t n_w = output->dims->data[1]; // result in row
-    uint16_t n_h = output->dims->data[2]; // result in col
+    uint16_t n_h = output->dims->data[1]; // result in row
+    uint16_t n_w = output->dims->data[2]; // result in col
     uint16_t n_t = output->dims->data[3]; // result in target
 
     yuv422p2rgb(input->data.uint8, (const uint8_t *)img, oh, ow, c, h, w, VISION_ROTATION);
@@ -143,9 +143,9 @@ extern "C" int tflitemicro_algo_run(uint32_t img, uint32_t ow, uint32_t oh)
 
     _fomo_list.clear();
 
-    for (int i = 0; i < n_w; i++)
+    for (int i = 0; i < n_h; i++)
     {
-        for (int j = 0; j < n_h; j++)
+        for (int j = 0; j < n_w; j++)
         {
             uint8_t max_conf = 0;
             uint8_t max_target = 0;
@@ -161,11 +161,10 @@ extern "C" int tflitemicro_algo_run(uint32_t img, uint32_t ow, uint32_t oh)
             if (max_conf > CONFIDENCE_THRESHOLD && max_target != 0)
             {
                 fomo_t obj;
-                obj.x = i * ow / n_w - ow / n_w / 2;
-                obj.y = j * oh / n_h - oh / n_h / 2;
+                obj.x = j * ow / n_w + (ow / n_w) / 2;
+                obj.y = i * oh / n_h + (oh / n_h) / 2;
                 obj.confidence = max_conf;
                 obj.target = max_target;
-                LOGGER_INFO("[fomo] i:%d j:%d conf:%d target:%d\n", i, j, obj.confidence, obj.target);
                 _fomo_list.emplace_front(obj);
             }
         }
@@ -211,8 +210,8 @@ int tflitemicro_algo_get_preview(char *preview, uint16_t max_length)
         {
             snprintf(element[0], sizeof(element[0]), "%s,%d", element[0], it->x);
             snprintf(element[1], sizeof(element[1]), "%s,%d", element[1], it->y);
-            snprintf(element[2], sizeof(element[2]), "%s,%d", element[2], 5);
-            snprintf(element[3], sizeof(element[3]), "%s,%d", element[3], 5);
+            snprintf(element[2], sizeof(element[2]), "%s,%d", element[2], 8);
+            snprintf(element[3], sizeof(element[3]), "%s,%d", element[3], 8);
             snprintf(element[4], sizeof(element[4]), "%s,%d", element[4], it->target);
             snprintf(element[5], sizeof(element[5]), "%s,%d", element[5], it->confidence);
         }
