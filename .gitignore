@@ -11,3 +11,6 @@ tools/
 # export format
 *.uf2
 *.tflite
+
+# model zone
+!model_zone/*.*
