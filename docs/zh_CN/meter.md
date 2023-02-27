@@ -21,23 +21,20 @@
 ```
 
 ## 训练模型
-
-### 准备好数据集
-
-使用提供的数据集来训练模型。
+### 准备数据集
+使用我们提供的数据集来训练模型。
 
 ```bash
 cd EdgeLab
 mkdir -p datasets
 cd datasets
-wget https://files.seeedstudio.com/wiki/Edgelab/coco_mask.zip
-解压coco_mask.zip
+wget https://files.seeedstudio.com/wiki/Edgelab/meter.zip
+unzip meter.zip
 ```
 
-### 准备好配置文件
-
+### 准备配置文件
 ```python
-_base_ = './_base_/default_runtime.py
+_base_ = '../_base_/default_runtime.py'
 
 num_classes=1
 model = dict(type='PFLD',
@@ -45,36 +42,36 @@ model = dict(type='PFLD',
                            inchannel=3,
                            layer1=[16, 16, 16, 16, 16],
                            layer2=[32, 32, 32, 32, 32, 32],
-                           out_channel=16）。
+                           out_channel=16),
              head=dict(
                  type='PFLDhead',
                  num_point=num_classes,
                  input_channel=16,
              ),
-             loss_cfg=dict(type='PFLDLoss')
+             loss_cfg=dict(type='PFLDLoss'))
 
 
-# 数据集设置
-dataset_type = 'MeterData'.
+# dataset settings
+dataset_type = 'MeterData'
 
-data_root = '~/datasets/meter'。
+data_root = '../work_dirs/datasets/meter'
 height=112
-weight=112
+width=112
 batch_size=32
 workers=4
 
 train_pipeline = [
-    dict(type=Resize, height=height, width=width, interpolation=0),
-    dict(type='ColorJitter', brightness=0.3, p=0.5)。
+    dict(type="Resize", height=height, width=width, interpolation=0),
+    dict(type='ColorJitter', brightness=0.3, p=0.5),
     # dict(type='GaussNoise'),
-    dict(type='MedianBlur', blur_limit=3, p=0.3)。
+    dict(type='MedianBlur', blur_limit=3, p=0.3),
     dict(type='HorizontalFlip'),
-    dict(type='VerticalFlip')。
-    dict(type='Rotate')。
+    dict(type='VerticalFlip'),
+    dict(type='Rotate'),
     dict(type='Affine', translate_percent=[0.05, 0.1], p=0.6)
 ]
 
-val_pipeline = [dict(type=Resize, height=height, width=width)] 。
+val_pipeline = [dict(type="Resize", height=height, width=width)]
 
 
 
@@ -84,53 +81,66 @@ data = dict(
     train=dict(type=dataset_type,
                data_root=data_root,
                index_file=r'train/annotations.txt',
-               pipeline=train_pipeline。
-               test_mode=False）。
+               pipeline=train_pipeline,
+               test_mode=False),
     val=dict(type=dataset_type,
              data_root=data_root,
              index_file=r'val/annotations.txt',
-             pipeline=val_pipeline。
-             test_mode=True）。
+             pipeline=val_pipeline,
+             test_mode=True),
     test=dict(type=dataset_type,
               data_root=data_root,
               index_file=r'val/annotations.txt',
               pipeline=val_pipeline,
               test_mode=True
-              # dataset_info={{_base_.dataset_info}}。
+              # dataset_info={{_base_.dataset_info}}
               ))
 
 
 lr=0.0001
 epochs=300
-评估 = dict(save_best='loss')
-optimizer = dict(type='Adam', lr=lr, betas=（0.9, 0.99）, weight_decay=1e-6)
+evaluation = dict(save_best='loss')
+optimizer = dict(type='Adam', lr=lr, betas=(0.9, 0.99), weight_decay=1e-6)
 optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
-# 学习策略
+# learning policy
 lr_config = dict(policy='step',
-                 warmup='线性'。
+                 warmup='linear',
                  warmup_iters=400,
                  warmup_ratio=0.0001,
                  step=[400, 440, 490])
 total_epochs = epochs
 find_unused_parameters = True
 ```
+保存为EdgeLab/configs/pfld/pfld_mv2n_112_custom.py
 
 ### 训练模型
 
+获取预训练模型
 ```bash
 cd EdgeLab
-conda激活Edgelab
-tools/train.py mmpose configs/pfld/pfld_mv2n_112.py --gpus=1 --cfg-options total_epochs=50
+mkdir -p work_dirs/pretrain/ && cd work_dirs/pretrain
+wget  https://github.com/Seeed-Studio/EdgeLab/releases/download/model_zoo/pfld_mv2n_112.pth 
 ```
 
-## 转换模型
-
-**第1步:** 将模型转换为TensorFlow Lite。
+训练表记模型模型
 
 ```bash
 cd EdgeLab
-conda激活edgelab
-python tools/export.py configs/pfld/pfld_mv2n_112.py --weights work_dirs/pfld_mv2n_112/exp1/latest.pth --data ~/datasets/meter/train/images
+conda activate edgelab
+python tools/train.py mmpose configs/pfld/pfld_mv2n_112_custom.py --gpus=1 --cfg-options total_epochs=50 load_from=./work_dirs/pretrain/pfld_mv2n_112.pth 
+```
+训练完成的模型会存储到 **exp**`<x>`目录下，x是训练的工作目录
+
+### 模型转换
+**第1步:**  将模型转换为TensorFlow Lite。
+
+```bash
+cd EdgeLab
+conda activate edgelab
+python tools/torch2tflite.py mmpose  configs/pfld/pfld_mv2n_112_custom.py --weights work_dirs/pfld_mv2n_112_custom/exp1/latest.pth --tflite_type int8 
+```
+```{note}
+注意：路径中的exp1是第一次训练是生成的，如果您多次训练expx会依次累加。
 ```
 
 现在我们将把生成的TFLite文件转换为UF2文件，这样我们就可以直接把UF2文件闪存到Grove - Vision AI Module和SenseCAP A1101中。

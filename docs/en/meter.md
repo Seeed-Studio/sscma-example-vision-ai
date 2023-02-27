@@ -19,7 +19,6 @@ This tutorial shows how to train and deploy a meter reading detection model on G
 ```{note}
 Plesae make sure that you have installed the latest version of EdgeLab
 ```
-
 ## Train the model
 
 ### Prepare the dataset
@@ -30,8 +29,8 @@ Use the provided dataset to train the model.
 cd EdgeLab
 mkdir -p datasets
 cd datasets
-wget https://files.seeedstudio.com/wiki/Edgelab/coco_mask.zip
-unzip coco_mask.zip
+wget https://files.seeedstudio.com/wiki/Edgelab/meter.zip
+unzip meter.zip
 ```
 
 ### Prepare the configuration file
@@ -57,14 +56,14 @@ model = dict(type='PFLD',
 # dataset settings
 dataset_type = 'MeterData'
 
-data_root = '~/datasets/meter'
+data_root = './work_dirs/datasets/meter'
 height=112
 width=112
 batch_size=32
 workers=4
 
 train_pipeline = [
-    dict(type=Resize, height=height, width=width, interpolation=0),
+    dict(type="Resize", height=height, width=width, interpolation=0),
     dict(type='ColorJitter', brightness=0.3, p=0.5),
     # dict(type='GaussNoise'),
     dict(type='MedianBlur', blur_limit=3, p=0.3),
@@ -74,7 +73,7 @@ train_pipeline = [
     dict(type='Affine', translate_percent=[0.05, 0.1], p=0.6)
 ]
 
-val_pipeline = [dict(type=Resize, height=height, width=width)]
+val_pipeline = [dict(type="Resize", height=height, width=width)]
 
 
 
@@ -120,8 +119,9 @@ find_unused_parameters = True
 ```bash
 cd EdgeLab
 conda activate edgelab
-tools/train.py mmpose configs/pfld/pfld_mv2n_112.py --gpus=1 --cfg-options total_epochs=50
+tools/train.py mmpose configs/pfld/pfld_mv2n_112.py --cfg-options total_epochs=50
 ```
+
 
 ## Convert the model
 
