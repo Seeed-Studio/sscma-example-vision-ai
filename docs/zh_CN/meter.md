@@ -115,14 +115,14 @@ find_unused_parameters = True
 
 ### 训练模型
 
-获取预训练模型
+#### 获取预训练模型
 ```bash
 cd EdgeLab
 mkdir -p work_dirs/pretrain/ && cd work_dirs/pretrain
 wget  https://github.com/Seeed-Studio/EdgeLab/releases/download/model_zoo/pfld_mv2n_112.pth 
 ```
 
-训练表记模型模型
+##### 训练表记模型模型
 
 ```bash
 cd EdgeLab
@@ -131,14 +131,16 @@ python tools/train.py mmpose configs/pfld/pfld_mv2n_112_custom.py --gpus=1 --cfg
 ```
 训练完成的模型会存储到 **exp**`<x>`目录下，x是训练的工作目录
 
-### 模型转换
-**第1步:**  将模型转换为TensorFlow Lite。
+## 模型转换
+
+**Step 1:** 将模型转换为TensorFlow Lite。
 
 ```bash
 cd EdgeLab
 conda activate edgelab
 python tools/torch2tflite.py mmpose  configs/pfld/pfld_mv2n_112_custom.py --weights work_dirs/pfld_mv2n_112_custom/exp1/latest.pth --tflite_type int8 
 ```
+
 ```{note}
 注意：路径中的exp1是第一次训练是生成的，如果您多次训练expx会依次累加。
 ```
@@ -150,7 +152,9 @@ python tools/torch2tflite.py mmpose  configs/pfld/pfld_mv2n_112_custom.py --weig
 ```bash
 cd edgelab-example-vision-ai
 python tools/uf2conv/ -f GROVEAI -t 1 -c <path to model.tflite> -o model.uf2
+
 ```
+
 
 ## 将模型和固件烧录到Grove - Vision AI Module和SenseCAP A1101
 
@@ -159,16 +163,15 @@ python tools/uf2conv/ -f GROVEAI -t 1 -c <path to model.tflite> -o model.uf2
 
 **Step 1.** 通过USB Type-C 将Grove - Vision AI Module/ SenseCAP A1101连接到PC
 
-
-<div align=center><img width=1000 src="../_static/vision_ai/images/45.png"/></div>
+![45](../_static/vision_ai/images/45.png)
 
 **Step 2.** 双击 `boot` 按键进入 **DFU** 模式
 
-<div align=center><img width=1000 src="../_static/vision_ai/images/46.png"/></div>
+![47](../_static/vision_ai/images/47.png)
 
 **Step 3:** 你会看到一个新的存储设备 **GROVEAI** 是 **Grove - Vision AI Module** **VISIONAI** 是 **SenseCAP A1101**
 
-<div align=center><img width=500 src="../_static/vision_ai/images/62.jpg"/></div>
+![48](../_static/vision_ai/images/48.png)
 
 **Step 4:** 将生成 **firmware.uf2** 复制到对应的存储设备中, 重复进入DFU模式后将 **model.uf2**复制到对应的存储设备中
 
@@ -182,52 +185,52 @@ python tools/uf2conv/ -f GROVEAI -t 1 -c <path to model.tflite> -o model.uf2
 **Step 1:** 完成上述的模型还有固件烧录工作后, 打开 [链接](https://files.seeedstudio.com/grove_ai_vision/index.html)
         
 **Step 2:** 点击 **Connect** 按钮. 你会看到一个弹出窗口. 选择 **Grove AI - （配对）** 然后点击**Connect**
-<div align=center><img width=800 src="../_static/vision_ai/images/13.jpg"></div>
+![13](../_static/vision_ai/images/13.jpg)
         
-<div align=center><img width=400 src="../_static/vision_ai/images/12.png"></div>
+![12](../_static/vision_ai/images/12.png)
         
 如果连接成功，你会看到以下界面
         
-<div align=center><img width=800 src="../_static/vision_ai/images/14.png"></div>
+![14](../_static/vision_ai/images/14.png)
         
 现在我们需要设置3个点，分别是中心点，起始点和结束点。
 
 **Step 3:** 点击 **Set Center Point** 然后选择预览界面中指针中心点位置. 你会看到一个弹出窗口，确认位置后点击 **OK**
         
-<div align=center><img width=800 src="../_static/vision_ai/images/15.png"></div>
+![15](../_static/vision_ai/images/15.png)
         
 你会看到中心点已经被记录
         
-<div align=center><img width=800 src="../_static/vision_ai/images/16.png"></div>
+![16](../_static/vision_ai/images/16.png)
         
 **Step 4:** 点击 **Set Start Point**  然后选择预览界面中指针起始位置.你会看到一个弹出窗口，确认位置后点击 **OK**
         
-<div align=center><img width=800 src="../_static/vision_ai/images/17.png"></div>
+![17](../_static/vision_ai/images/17.png)
         
 你会看到起始点已经被记录
         
-<div align=center><img width=800 src="../_static/vision_ai/images/18.png"></div>
+![18](../_static/vision_ai/images/18.png)
         
 **Step 5:** Click on **Set End Point** 然后选择预览界面中指针结束位置.你会看到一个弹出窗口，确认位置后点击 **OK**
 
-<div align=center><img width=800 src="../_static/vision_ai/images/19.png"></div>
+![19](../_static/vision_ai/images/19.png)
         
 你会看到结束点已经被记录
         
-<div align=center><img width=800 src="../_static/vision_ai/images/20.png"></div>
+![20](../_static/vision_ai/images/20.png)
         
 **Step 6:** 根据表盘的第一位和最后一位数字设置测量范围。例如，我们设置为 **From:0 To 0.16**
 
-<div align=center><img width=800 src="../_static/vision_ai/images/21.png"></div>
+![21](../_static/vision_ai/images/21.png)
         
 
 **Step 7:** 配置小数点位数. 这里我们设置为2
         
-<div align=center><img width=800 src="../_static/vision_ai/images/22.png"></div>
+![22](../_static/vision_ai/images/22.png)
         
 最后，你可以看到实时表盘读数结果，如下所示
         
-<div align=center><img width=800 src="../_static/vision_ai/images/meter.gif"/></div>
+![meter](../_static/vision_ai/images/meter.gif)
 
 
 

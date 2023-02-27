@@ -86,15 +86,16 @@ This explains how you can flash the firmware to Grove - Vision AI Module.
 
 - **Step 1:** Connect Grove - Vision AI Module to the host PC via USB Type-C cable 
 
-<div align=center><img width=460 src="https://files.seeedstudio.com/wiki/SenseCAP-A1101/47.png"/></div>
+![47](../_static/vision_ai/images/47.png)
 
 - **Step 2:** Double-click the boot button on Grove - Vision AI Module to DFU mode
 
-<div align=center><img width=220 src="https://files.seeedstudio.com/wiki/SenseCAP-A1101/48.png"/></div>
+![48](../_static/vision_ai/images/48.png)
 
 - **Step 3:** After this you will see a new storage drive shown on your file explorer as **GROVEAI**
 
-<div align=center><img width=250 src="https://files.seeedstudio.com/wiki/SenseCAP-A1101/19.jpg"/></div>
+![19](../_static/vision_ai/images/19.jpg)
+
 
 - **Step 4:** Drag and drop the prevous **firmware.uf2** and **model.uf2** file to GROVEAI drive in sequence.
 
@@ -108,13 +109,13 @@ You need to enter DFU mode twice separately, once to flash the firmware and once
 
 - **Step 2:** Click **Connect** button. Then you will see a pop up on the browser. Select **Grove AI - Paired** and click **Connect**
   
-<div align=center><img width=1000 src="../_static/vision_ai/images/meter_p1.png"/></div>
+![meter_p1](../_static/vision_ai/images/meter_p1.png)
 
 - **Step 2:** Setup **config** 
 
 After that, you can see the real-time video stream on the Web Page.
 
-<div align=center><img width=800 src="../_static/vision_ai/images/meter.gif"/></div>
+![meter](../_static/vision_ai/images/meter.gif)
 
 ### Performance 
 
@@ -123,7 +124,7 @@ The performance of the EdgeLab-related models, measured on different chipsets, i
 | Target | Model | Dataset | Input Resolution | Peak RAM |Inferencing  Time | F1 Score|Link|
 | ---- | -----| ---| ---| -----------| --------| --------| --------|
 | Grove Vision AI |          Meter         | [custom](https://files.seeedstudio.com/wiki/Edgelab/meter.zip)|112x112 (RGB)| 320KB |     500ms    |  97% |[pfld_meter_int8.tflite](../../model_zone/pfld_meter_int8.tflite)|
-| Grove Vision AI  |          Fomo          | [custom]()|96x96 (GRAY)| 244KB |    150ms    |  99.5%|[fomo_int8.tflite](../../model_zone/fomo_mask_int8.tflite)|
+| Grove Vision AI  |          Fomo          | [custom]()|96x96 (GRAY)| 244KB |    150ms    |  99.5%|[fomo_mask_int8.tflite](../../model_zone/fomo_mask_int8.tflite)|
 
 ## Contributing
 - If you find an issue in these examples, or wish to submit an enhancement request, please use the Issues section on Github.

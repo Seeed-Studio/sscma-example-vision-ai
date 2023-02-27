@@ -81,15 +81,15 @@ python3 tools/ufconv/uf2conv.py -t 1 -c ./model_zone/ pfld_meter_int8.tflite -o 
 
 - **Step 1:** 通过 USB Type-C 将 Grove - Vision AI 连接到 PC
 
-<div align=center><img width=460 src="https://files.seeedstudio.com/wiki/SenseCAP-A1101/47.png"/></div>
+![47](../_static/vision_ai/images/47.png)
 
 - **Step 2:** 双击BOOT键，使得 Grove - Vision AI 进入 DFU 模式
 
-<div align=center><img width=220 src="https://files.seeedstudio.com/wiki/SenseCAP-A1101/48.png"/></div>
+![48](../_static/vision_ai/images/48.png)
 
 - **Step 3:** 看到一个 **GROVEAI** 的新的存储设备，
 
-<div align=center><img width=250 src="https://files.seeedstudio.com/wiki/SenseCAP-A1101/19.jpg"/></div>
+![19](../_static/vision_ai/images/19.jpg)
 
 - **Step 4:** 将 **firmware.uf2** 还有 **model.uf2** 依次复制到 **GROVEAI** 设备中
 
@@ -104,11 +104,11 @@ Note: 你需要分开两次进入 DFU 模式，一次烧录固件，一次烧录
 
 - **Step 2:** 点击 **Connect** 按钮. 你可以看到一个弹出窗口. 选择 **Grove AI - Paired** 然后点击 **Connect** 进行连接
   
-<div align=center><img width=1000 src="../_static/vision_ai/images/meter_p1.png"/></div>
+![meter_p1](../_static/vision_ai/images/meter_p1.png)
 
 接着你就可以看到一个预览界面了.
 
-<div align=center><img width=800 src="../_static/vision_ai/images/meter.gif"/></div>
+![meter](../_static/vision_ai/images/meter.gif)
 
 ### 性能 
 
@@ -116,7 +116,7 @@ Note: 你需要分开两次进入 DFU 模式，一次烧录固件，一次烧录
 | Target | Model | Dataset | Input Resolution | Peak RAM |Inferencing Time | F1 Score|Link|
 | ---- | -----| ---| ---| -----------| --------| --------| --------|
 | Grove Vision AI | 仪表 | [自定义](https://files.seeedstudio.com/wiki/Edgelab/meter.zip)|112x112 (RGB)| 320KB | 500ms | 97%|[pfld_meter_int8.tflite](./model_zone/pfld_meter_int8.tflite)|
-| Grove Vision AI | Fomo | [custom]()|96x96 (GRAY)| 244KB | 150ms | 99.5%|[fomo_int8.tflite](./model_zone/fomo_mask_int8.tflite)|
+| Grove Vision AI | Fomo | [custom]()|96x96 (GRAY)| 244KB | 150ms | 99.5%|[fomo_mask_int8.tflite](./model_zone/fomo_mask_int8.tflite)|
 
 ## 贡献
 
