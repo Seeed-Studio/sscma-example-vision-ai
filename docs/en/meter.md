@@ -148,15 +148,15 @@ This explains how you can flash the previously generated firmware (firmware.uf2)
 
 **Step 1.** Connect Grove - Vision AI Module/ SenseCAP A1101 to PC by using USB Type-C cable 
 
-<div align=center><img width=1000 src="../_static/45.png"/></div>
+<div align=center><img width=1000 src="../_static/vision_ai/images/45.png"/></div>
 
 **Step 2.** Double click the boot button to enter **boot mode**
 
-<div align=center><img width=1000 src="../_static/46.png"/></div>
+<div align=center><img width=1000 src="../_static/vision_ai/images/46.png"/></div>
 
 **Step 3:** After this you will see a new storage drive shown on your file explorer as **GROVEAI** for **Grove - Vision AI Module** and as **VISIONAI** for **SenseCAP A1101**
 
-<div align=center><img width=500 src="../_static/62.jpg"/></div>
+<div align=center><img width=500 src="../_static/vision_ai/images/62.jpg"/></div>
 
 **Step 4:** Drag and drop the previous **firmware.uf2** at first, and then the **model.uf2** file to **GROVEAI** or **VISIONAI** 
 
@@ -169,49 +169,49 @@ You need to enter DFU mode twice separately, once to flash the firmware and once
 **Step 1:** After loading the firmware and connecting to PC, visit [this URL](https://files.seeedstudio.com/grove_ai_vision/index.html)
         
 **Step 2:** Click **Connect** button. Then you will see a pop up on the browser. Select **Grove AI - Paired** and click **Connect**
-<div align=center><img width=800 src="../_static/13.jpg"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/13.jpg"></div>
         
-<div align=center><img width=400 src="../_static/12.png"></div>
+<div align=center><img width=400 src="../_static/vision_ai/images/12.png"></div>
         
 Upon successful connection, you will see a live preview from the camera. Here the camera is pointed at an analog meter.
         
-<div align=center><img width=800 src="../_static/14.png"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/14.png"></div>
         
 Now we need to set 3 points which is the center point, start point and the end point. 
         
 **Step 3:** Click on **Set Center Point** and click on the center of the meter. you will see a pop up confirm the location and press **OK**
         
-<div align=center><img width=800 src="../_static/15.png"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/15.png"></div>
         
 You will see the center point is already recorded
         
-<div align=center><img width=800 src="../_static/16.png"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/16.png"></div>
         
 **Step 4:** Click on **Set Start Point** and click on the first indicator point. you will see a pop up confirm the location and press **OK**
         
-<div align=center><img width=800 src="../_static/17.png"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/17.png"></div>
         
 You will see the first indicator point is already recorded
         
-<div align=center><img width=800 src="../_static/18.png"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/18.png"></div>
         
 **Step 5:** Click on **Set End Point** and click on the last indicator point. you will see a pop up confirm the location and press **OK**
 
-<div align=center><img width=800 src="../_static/19.png"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/19.png"></div>
         
 You will see the last indicator point is already recorded
         
-<div align=center><img width=800 src="../_static/20.png"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/20.png"></div>
         
 **Step 6:** Set the measuring range according to the first digit and last digit of the meter. For example, he we set as **From:0 To 0.16**
         
-<div align=center><img width=800 src="../_static/21.png"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/21.png"></div>
         
 **Step 7:** Set the number of decimal places that you want the result to display. Here we set as 2
         
-<div align=center><img width=800 src="../_static/22.png"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/22.png"></div>
         
 Finally you can see the live meter reading results as follows
         
-<div align=center><img width=800 src="../_static/meter.gif"/></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/meter.gif"/></div>
 

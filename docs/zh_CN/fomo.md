@@ -56,15 +56,15 @@ python tools/uf2conv/ -f GROVEAI -t 1 -c <path to model.tflite> -o model.uf2
 **Step 1.** 通过USB Type-C 将Grove - Vision AI Module/ SenseCAP A1101连接到PC
 
 
-<div align=center><img width=1000 src="../_static/45.png"/></div>
+<div align=center><img width=1000 src="../_static/vision_ai/images/45.png"/></div>
 
 **Step 2.** 双击 `boot` 按键进入 **DFU** 模式
 
-<div align=center><img width=1000 src="../_static/46.png"/></div>
+<div align=center><img width=1000 src="../_static/vision_ai/images/46.png"/></div>
 
 **Step 3:** 你会看到一个新的存储设备 **GROVEAI** 是 **Grove - Vision AI Module** **VISIONAI** 是 **SenseCAP A1101**
 
-<div align=center><img width=500 src="../_static/62.jpg"/></div>
+<div align=center><img width=500 src="../_static/vision_ai/images/62.jpg"/></div>
 
 **Step 4:** 将生成 **firmware.uf2** 复制到对应的存储设备中, 重复进入DFU模式后将 **model.uf2**复制到对应的存储设备中
 
@@ -78,11 +78,11 @@ python tools/uf2conv/ -f GROVEAI -t 1 -c <path to model.tflite> -o model.uf2
 **Step 1:** 完成上述的模型还有固件烧录工作后, 打开 [链接](https://files.seeedstudio.com/grove_ai_vision/index.html)
         
 **Step 2:** 点击 **Connect** 按钮. 你会看到一个弹出窗口. 选择 **Grove AI - （配对）** 然后点击**Connect**
-<div align=center><img width=800 src="../_static/13.jpg"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/13.jpg"></div>
         
-<div align=center><img width=400 src="../_static/12.png"></div>
+<div align=center><img width=400 src="../_static/vision_ai/images/12.png"></div>
         
 如果连接成功，你会看到以下界面
         
-<div align=center><img width=800 src="../_static/14.png"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/14.png"></div>
         

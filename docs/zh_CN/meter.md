@@ -150,15 +150,15 @@ python tools/uf2conv/ -f GROVEAI -t 1 -c <path to model.tflite> -o model.uf2
 **Step 1.** 通过USB Type-C 将Grove - Vision AI Module/ SenseCAP A1101连接到PC
 
 
-<div align=center><img width=1000 src="../_static/45.png"/></div>
+<div align=center><img width=1000 src="../_static/vision_ai/images/45.png"/></div>
 
 **Step 2.** 双击 `boot` 按键进入 **DFU** 模式
 
-<div align=center><img width=1000 src="../_static/46.png"/></div>
+<div align=center><img width=1000 src="../_static/vision_ai/images/46.png"/></div>
 
 **Step 3:** 你会看到一个新的存储设备 **GROVEAI** 是 **Grove - Vision AI Module** **VISIONAI** 是 **SenseCAP A1101**
 
-<div align=center><img width=500 src="../_static/62.jpg"/></div>
+<div align=center><img width=500 src="../_static/vision_ai/images/62.jpg"/></div>
 
 **Step 4:** 将生成 **firmware.uf2** 复制到对应的存储设备中, 重复进入DFU模式后将 **model.uf2**复制到对应的存储设备中
 
@@ -172,52 +172,52 @@ python tools/uf2conv/ -f GROVEAI -t 1 -c <path to model.tflite> -o model.uf2
 **Step 1:** 完成上述的模型还有固件烧录工作后, 打开 [链接](https://files.seeedstudio.com/grove_ai_vision/index.html)
         
 **Step 2:** 点击 **Connect** 按钮. 你会看到一个弹出窗口. 选择 **Grove AI - （配对）** 然后点击**Connect**
-<div align=center><img width=800 src="../_static/13.jpg"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/13.jpg"></div>
         
-<div align=center><img width=400 src="../_static/12.png"></div>
+<div align=center><img width=400 src="../_static/vision_ai/images/12.png"></div>
         
 如果连接成功，你会看到以下界面
         
-<div align=center><img width=800 src="../_static/14.png"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/14.png"></div>
         
 现在我们需要设置3个点，分别是中心点，起始点和结束点。
 
 **Step 3:** 点击 **Set Center Point** 然后选择预览界面中指针中心点位置. 你会看到一个弹出窗口，确认位置后点击 **OK**
         
-<div align=center><img width=800 src="../_static/15.png"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/15.png"></div>
         
 你会看到中心点已经被记录
         
-<div align=center><img width=800 src="../_static/16.png"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/16.png"></div>
         
 **Step 4:** 点击 **Set Start Point**  然后选择预览界面中指针起始位置.你会看到一个弹出窗口，确认位置后点击 **OK**
         
-<div align=center><img width=800 src="../_static/17.png"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/17.png"></div>
         
 你会看到起始点已经被记录
         
-<div align=center><img width=800 src="../_static/18.png"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/18.png"></div>
         
 **Step 5:** Click on **Set End Point** 然后选择预览界面中指针结束位置.你会看到一个弹出窗口，确认位置后点击 **OK**
 
-<div align=center><img width=800 src="../_static/19.png"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/19.png"></div>
         
 你会看到结束点已经被记录
         
-<div align=center><img width=800 src="../_static/20.png"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/20.png"></div>
         
 **Step 6:** 根据表盘的第一位和最后一位数字设置测量范围。例如，我们设置为 **From:0 To 0.16**
 
-<div align=center><img width=800 src="../_static/21.png"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/21.png"></div>
         
 
 **Step 7:** 配置小数点位数. 这里我们设置为2
         
-<div align=center><img width=800 src="../_static/22.png"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/22.png"></div>
         
 最后，你可以看到实时表盘读数结果，如下所示
         
-<div align=center><img width=800 src="../_static/meter.gif"/></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/meter.gif"/></div>
 
 
 

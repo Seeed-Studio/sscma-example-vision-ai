@@ -104,11 +104,11 @@ python3 tools/ufconv/uf2conv.py -t 1 -c ./model_zone/ pfld_meter_int8.tflite -o 
 
 - **Step 2:** 点击 **Connect** 按钮. 你可以看到一个弹出窗口. 选择 **Grove AI - Paired** 然后点击 **Connect** 进行连接
   
-<div align=center><img width=1000 src="./docs/_static/meter_p1.png"/></div>
+<div align=center><img width=1000 src="./docs/_static/vision_ai/images/meter_p1.png"/></div>
 
 接着你就可以看到一个预览界面了.
 
-<div align=center><img width=800 src="./docs/_static/meter.gif"/></div>
+<div align=center><img width=800 src="./docs/_static/vision_ai/images/meter.gif"/></div>
 
 ### 性能 
 

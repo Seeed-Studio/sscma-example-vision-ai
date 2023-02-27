@@ -60,15 +60,15 @@ This explains how you can flash the previously generated firmware (firmware.uf2)
 
 **Step 1.** Connect Grove - Vision AI Module/ SenseCAP A1101 to PC by using USB Type-C cable 
 
-<div align=center><img width=1000 src="../_static/45.png"/></div>
+<div align=center><img width=1000 src="../_static/vision_ai/images/45.png"/></div>
 
 **Step 2.** Double click the boot button to enter **boot mode**
 
-<div align=center><img width=1000 src="../_static/46.png"/></div>
+<div align=center><img width=1000 src="../_static/vision_ai/images/46.png"/></div>
 
 **Step 3:** After this you will see a new storage drive shown on your file explorer as **GROVEAI** for **Grove - Vision AI Module** and as **VISIONAI** for **SenseCAP A1101**
 
-<div align=center><img width=500 src="../_static/62.jpg"/></div>
+<div align=center><img width=500 src="../_static/vision_ai/images/62.jpg"/></div>
 
 **Step 4:** Drag and drop the previous **firmware.uf2** at first, and then the **model.uf2** file to **GROVEAI** or **VISIONAI** 
 
@@ -81,9 +81,9 @@ You need to enter DFU mode twice separately, once to flash the firmware and once
 **Step 1:** After loading the firmware and connecting to PC, visit [this URL](https://files.seeedstudio.com/grove_ai_vision/index.html)
         
 **Step 2:** Click **Connect** button. Then you will see a pop up on the browser. Select **Grove AI - Paired** and click **Connect**
-<div align=center><img width=800 src="../_static/13.jpg"></div>
+<div align=center><img width=800 src="../_static/vision_ai/images/13.jpg"></div>
         
-<div align=center><img width=400 src="../_static/12.png"></div>
+<div align=center><img width=400 src="../_static/vision_ai/images/12.png"></div>
         
 
 

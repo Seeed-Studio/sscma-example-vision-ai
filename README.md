@@ -108,13 +108,13 @@ You need to enter DFU mode twice separately, once to flash the firmware and once
 
 - **Step 2:** Click **Connect** button. Then you will see a pop up on the browser. Select **Grove AI - Paired** and click **Connect**
   
-<div align=center><img width=1000 src="./docs/_static/meter_p1.png"/></div>
+<div align=center><img width=1000 src="./docs/_static/vision_ai/images/meter_p1.png"/></div>
 
 - **Step 2:** Setup **config** 
 
 After that, you can see the real-time video stream on the Web Page.
 
-<div align=center><img width=800 src="./docs/_static/meter.gif"/></div>
+<div align=center><img width=800 src="./docs/_static/vision_ai/images/meter.gif"/></div>
 
 ### Performance 
 
