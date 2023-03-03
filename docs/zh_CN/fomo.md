@@ -157,6 +157,21 @@ python tools/uf2conv/ -f GROVEAI -t 1 -c <path to model.tflite> -o model.uf2
 注意：路径中的exp1是第一次训练是生成的，如果您多次训练expx会依次累加。
 ```
 
+## 准备固件
+
+### 编译固件
+
+```bash
+cd edgelab-example-vision-ai
+make HW=grove_vision_ai APP=fomo
+```
+### 生成固件
+
+```bash
+cd edgelab-example-vision-ai
+python3 tools/ufconv/uf2conv.py -t 0 -c tools/image_gen_cstm/output/output.img -o firmware.uf2
+```
+
 ## 将模型和固件烧录到Grove - Vision AI Module和SenseCAP A1101
 
 以下是如何将先前生成的固件（firmware.uf2）和模型文件（model.uf2）闪存到Grove - Vision AI Module和SenseCAP A1101的说明。

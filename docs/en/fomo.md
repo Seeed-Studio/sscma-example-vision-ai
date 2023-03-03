@@ -154,6 +154,20 @@ cd edgelab-example-vision-ai
 python tools/uf2conv/ -f GROVEAI -t 1 -c <path to model.tflite> -o model.uf2
 ```
 
+## Prepare the firmware
+
+### Build the firmware
+```bash
+cd edgelab-example-vision-ai
+make HW=grove_vision_ai APP=fomo
+```
+### Convert the firmware to UF2 file
+
+```bash
+cd edgelab-example-vision-ai
+python3 tools/ufconv/uf2conv.py -t 0 -c tools/image_gen_cstm/output/output.img -o firmware.uf2
+```
+
 ### Flash the model and model
 
 This explains how you can flash the previously generated firmware (firmware.uf2) and the model file (model.uf2) to Grove - Vision AI Module and SenseCAP A1101.

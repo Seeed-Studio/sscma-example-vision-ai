@@ -51,7 +51,7 @@ ERROR_T hardware_init()
     return ERROR_NONE;
 }
 
-void main(void)
+int main(void)
 {
     int ercode = 0;
 
@@ -99,5 +99,5 @@ void main(void)
         }
     }
 
-    return;
+    return 0;
 }

@@ -155,6 +155,21 @@ python tools/uf2conv/ -f GROVEAI -t 1 -c <path to model.tflite> -o model.uf2
 
 ```
 
+## 准备固件
+
+### 编译固件
+
+```bash
+cd edgelab-example-vision-ai
+make HW=grove_vision_ai APP=meter
+```
+### 生成固件
+
+```bash
+cd edgelab-example-vision-ai
+python3 tools/ufconv/uf2conv.py -t 0 -c tools/image_gen_cstm/output/output.img -o firmware.uf2
+```
+
 
 ## 将模型和固件烧录到Grove - Vision AI Module和SenseCAP A1101
 
