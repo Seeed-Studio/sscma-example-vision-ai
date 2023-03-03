@@ -30,11 +30,8 @@
 #define USE_CAMERA
 #define OV2640_CAMERA
 
-//#define USE_IMU
-//#define IMU_LSM6DS3
-
-#define CMD_IMU
-#define CMD_GPIO
+#define USE_IMU
+#define IMU_LSM6DS3
 
 //#define I2C_READ_CRC
 //#define I2C_WRITE_CRC

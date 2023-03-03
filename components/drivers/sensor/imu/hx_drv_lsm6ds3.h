@@ -2089,6 +2089,10 @@ typedef struct dev_lsm6ds3
     struct SensorSettings settings;
 } DEV_LSM6DS3, *DEV_LSM6DS3_PTR;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 DEV_LSM6DS3_PTR hx_drv_lsm6ds3_init(USE_SS_IIC_E i2c);
 bool hx_drv_lsm6ds3_begin(DEV_LSM6DS3_PTR lsm6ds3);
 uint8_t hx_drv_lsm6ds3_gyro_available(DEV_LSM6DS3_PTR lsm6ds3);
@@ -2108,5 +2112,9 @@ float hx_drv_lsm6ds3_read_acc_z(DEV_LSM6DS3_PTR lsm6ds3);
 float hx_drv_lsm6ds3_read_gyro_x(DEV_LSM6DS3_PTR lsm6ds3);
 float hx_drv_lsm6ds3_read_gyro_y(DEV_LSM6DS3_PTR lsm6ds3);
 float hx_drv_lsm6ds3_read_gyro_z(DEV_LSM6DS3_PTR lsm6ds3);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
