@@ -16,7 +16,6 @@
 #ifndef ALGO_METER__H
 #define ALGO_METER__H
 
-
 #ifdef __cplusplus
 extern "C"
 {

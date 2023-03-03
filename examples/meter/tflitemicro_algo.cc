@@ -49,7 +49,7 @@ namespace
 } // namespace
 
 // TFu debug log, make it hardware platform print
-extern "C" void DebugLog(const char *s) { xprintf("%s", s); } //{ fprintf(stderr, "%s", s); }
+extern "C"  void DebugLog(const char *s) { xprintf("%s", s); } //{ fprintf(stderr, "%s", s); }
 
 #define MODEL_INDEX 1
 #define ALGORITHM_INDEX 3
@@ -58,7 +58,7 @@ extern "C" void DebugLog(const char *s) { xprintf("%s", s); } //{ fprintf(stderr
 #define IMAGE_PREIVEW_ELEMENT_SIZE 4
 #define IMAGE_PREVIEW_FORMATE "{\"type\":\"preview\", \"algorithm\":%d, \"model\":%d,\"count\":%d, \"object\":{\"x\": [%s],\"y\": [%s]}}"
 
-extern "C" int tflitemicro_algo_init()
+int tflitemicro_algo_init()
 {
     int ercode = 0;
     uint32_t *xip_flash_addr;
@@ -114,7 +114,7 @@ extern "C" int tflitemicro_algo_init()
     return ercode;
 }
 
-extern "C" int tflitemicro_algo_run(uint32_t img, uint32_t ow, uint32_t oh)
+int tflitemicro_algo_run(uint32_t img, uint32_t ow, uint32_t oh)
 {
 
     uint16_t h = input->dims->data[1];

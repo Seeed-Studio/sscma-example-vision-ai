@@ -22,6 +22,10 @@ typedef struct
     float (*get_gyro_z)(void);
 } Imu_Hal_Struct;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 ERROR_T imu_init(void);
 ERROR_T imu_deinit(void);
 bool imu_acc_available(void);
@@ -32,5 +36,9 @@ float imu_get_acc_z(void);
 float imu_get_gyro_x(void);
 float imu_get_gyro_y(void);
 float imu_get_gyro_z(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -34,7 +34,15 @@ typedef struct {
     }data;
 }Sensor_Cfg_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 ERROR_T sensor_init(Sensor_Cfg_t *sensor_cfg_t);
 ERROR_T sensor_deinit(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

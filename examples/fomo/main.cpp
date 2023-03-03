@@ -23,6 +23,9 @@
 #include "datapath.h"
 #include "sensor_core.h"
 #include "external_flash.h"
+#include "communication_core.h"
+#include "tflitemicro_algo.h"
+#include "i2c_handlers.h"
 
 char preview[1024];
 
@@ -30,11 +33,10 @@ ERROR_T hardware_init()
 {
 
     ERROR_T ret = ERROR_NONE;
-    Sensor_Cfg_t sensor_cfg_t = {
-        .sensor_type = SENSOR_CAMERA,
-        .data.camera_cfg.width = 240,
-        .data.camera_cfg.height = 240,
-    };
+    Sensor_Cfg_t sensor_cfg_t;
+    sensor_cfg_t.sensor_type = SENSOR_CAMERA;
+    sensor_cfg_t.data.camera_cfg.width = 240;
+    sensor_cfg_t.data.camera_cfg.height = 240;
 
     ret = datapath_init(sensor_cfg_t.data.camera_cfg.width,
                         sensor_cfg_t.data.camera_cfg.height);
@@ -51,9 +53,10 @@ ERROR_T hardware_init()
     return ERROR_NONE;
 }
 
-void main(void)
+int main(void)
 {
     int ercode = 0;
+    I2CServer *i2c;
 
     hx_drv_timer_init();
     debugger_init();
@@ -67,6 +70,8 @@ void main(void)
         LOGGER_INFO("tflitemicro_algo_init() error\n");
 
     hardware_init();
+
+    i2c = i2c_server_init();
 
     uint32_t frame = 0;
 
@@ -86,10 +91,10 @@ void main(void)
             uint32_t tick_end = board_get_cur_us();
             LOGGER_INFO("inference time: %d us\r", tick_end - tick_start);
         }
-        volatile uint32_t jpeg_addr;
-        volatile uint32_t jpeg_size;
+        uint32_t jpeg_addr;
+        uint32_t jpeg_size;
         datapath_get_jpeg_img(&jpeg_addr, &jpeg_size);
-        hx_drv_webusb_write_vision(jpeg_addr, jpeg_size);
+        hx_drv_webusb_write_vision((uint8_t *)jpeg_addr, jpeg_size);
         if (ercode == 0)
         {
             memset(preview, 0, 1024);
@@ -97,10 +102,10 @@ void main(void)
             if (strlen(preview) > 0)
             {
                 LOGGER_INFO("%s\r", preview);
-                hx_drv_webusb_write_text(preview, strlen(preview));
+                hx_drv_webusb_write_text((uint8_t *)preview, strlen(preview));
             }
         }
     }
 
-    return;
+    return 0;
 }

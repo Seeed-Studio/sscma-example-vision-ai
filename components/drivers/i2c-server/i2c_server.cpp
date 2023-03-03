@@ -19,9 +19,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "grove_ai_config.h"
-#include "ei_i2c_server.h"
-#include "edge-impulse-sdk/porting/ei_classifier_porting.h"
-#include "inference/ei_run_impulse.h"
+#include "i2c_server.h"
 
 #ifdef __cplusplus
 extern "C"

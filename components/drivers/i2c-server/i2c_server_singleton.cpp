@@ -15,7 +15,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "ei_i2c_server.h"
+#include "i2c_server.h"
 
 /*
  * The definition of get_instance method is here,

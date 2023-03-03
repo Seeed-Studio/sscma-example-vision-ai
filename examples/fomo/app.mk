@@ -14,6 +14,8 @@ ifeq ($(HW), grove_vision_ai)
 endif
 
 LIB_SEL += tflitemicro_25
+LIB_SEL += i2c_comm
+
 
 SCENARIO_APP_INCDIR = $(APP_ROOT)
 

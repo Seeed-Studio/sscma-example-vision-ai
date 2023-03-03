@@ -23,6 +23,8 @@
 #include "datapath.h"
 #include "sensor_core.h"
 #include "external_flash.h"
+#include "communication_core.h"
+#include "tflitemicro_algo.h"
 
 char preview[1024];
 
@@ -30,11 +32,10 @@ ERROR_T hardware_init()
 {
 
     ERROR_T ret = ERROR_NONE;
-    Sensor_Cfg_t sensor_cfg_t = {
-        .sensor_type = SENSOR_CAMERA,
-        .data.camera_cfg.width = 240,
-        .data.camera_cfg.height = 240,
-    };
+    Sensor_Cfg_t sensor_cfg_t;
+    sensor_cfg_t.sensor_type = SENSOR_CAMERA;
+    sensor_cfg_t.data.camera_cfg.width = 240;
+    sensor_cfg_t.data.camera_cfg.height = 240;
 
     ret = datapath_init(sensor_cfg_t.data.camera_cfg.width,
                         sensor_cfg_t.data.camera_cfg.height);
@@ -85,8 +86,8 @@ int main(void)
         }
         volatile uint32_t jpeg_addr;
         volatile uint32_t jpeg_size;
-        datapath_get_jpeg_img(&jpeg_addr, &jpeg_size);
-        hx_drv_webusb_write_vision(jpeg_addr, jpeg_size);
+        datapath_get_jpeg_img((uint32_t *)&jpeg_addr, (uint32_t *)&jpeg_size);
+        hx_drv_webusb_write_vision((uint8_t *)jpeg_addr, jpeg_size);
         if (ercode == 0)
         {
             memset(preview, 0, 1024);
@@ -94,7 +95,7 @@ int main(void)
             if (strlen(preview) > 0)
             {
                 LOGGER_INFO("%s\r", preview);
-                hx_drv_webusb_write_text(preview, strlen(preview));
+                hx_drv_webusb_write_text((uint8_t *)preview, strlen(preview));
             }
         }
     }

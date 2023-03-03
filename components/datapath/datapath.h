@@ -70,6 +70,10 @@ typedef struct {
     uint32_t jpeg_enc_filesize;
 } DataPath_state;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 ERROR_T datapath_init(uint16_t width, uint16_t height);
 ERROR_T datapath_start_work(void);
 bool datapath_get_img_state();
@@ -77,5 +81,9 @@ int datapath_restart();
 void datapath_get_jpeg_img(uint32_t *jpeg_enc_addr, uint32_t *jpeg_enc_filesize);
 uint32_t datapath_get_yuv_img_addr(void);
 ERROR_T datapath_set_roi_start_position(uint16_t start_x, uint16_t start_y);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
