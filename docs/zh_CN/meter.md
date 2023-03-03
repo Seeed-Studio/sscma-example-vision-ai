@@ -151,7 +151,7 @@ python tools/torch2tflite.py mmpose  configs/pfld/pfld_mv2n_112_custom.py --weig
 
 ```bash
 cd edgelab-example-vision-ai
-python tools/uf2conv/ -f GROVEAI -t 1 -c <path to model.tflite> -o model.uf2
+python tools/ufconv/uf2conv.py -f GROVEAI -t 1 -c <path to model.tflite> -o model.uf2
 
 ```
 
@@ -162,6 +162,7 @@ python tools/uf2conv/ -f GROVEAI -t 1 -c <path to model.tflite> -o model.uf2
 ```bash
 cd edgelab-example-vision-ai
 make HW=grove_vision_ai APP=meter
+make flash
 ```
 ### 生成固件
 

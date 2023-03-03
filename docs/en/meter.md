@@ -64,7 +64,7 @@ Now we will convert the generated TFLite file to a UF2 file so that we can direc
 
 ```bash
 cd edgelab-example-vision-ai
-python tools/uf2conv/ -f GROVEAI -t 1 -c <path to model.tflite> -o model.uf2
+python tools/ufconv/uf2conv.py -f GROVEAI -t 1 -c <path to model.tflite> -o model.uf2
 ```
 
 ## Prepare the firmware
@@ -73,6 +73,7 @@ python tools/uf2conv/ -f GROVEAI -t 1 -c <path to model.tflite> -o model.uf2
 ```bash
 cd edgelab-example-vision-ai
 make HW=grove_vision_ai APP=meter
+make flash
 ```
 ### Convert the firmware to UF2 file
 

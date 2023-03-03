@@ -151,8 +151,9 @@ python tools/torch2tflite.py mmdet  configs/fomo/fomo_mobnetv2_x8_custom.py --we
 
 ```bash
 cd edgelab-example-vision-ai
-python tools/uf2conv/ -f GROVEAI -t 1 -c <path to model.tflite> -o model.uf2
+python tools/ufconv/uf2conv.py -f GROVEAI -t 1 -c <path to model.tflite> -o model.uf2
 ```
+
 ```{note}
 注意：路径中的exp1是第一次训练是生成的，如果您多次训练expx会依次累加。
 ```
@@ -164,6 +165,7 @@ python tools/uf2conv/ -f GROVEAI -t 1 -c <path to model.tflite> -o model.uf2
 ```bash
 cd edgelab-example-vision-ai
 make HW=grove_vision_ai APP=fomo
+make flash
 ```
 ### 生成固件
 
