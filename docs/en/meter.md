@@ -34,6 +34,89 @@ unzip meter.zip
 ```
 ### Train the model
 
+#### Prepare the configuration file
+
+```python
+_base_ = '../_base_/default_runtime.py'
+
+num_classes=1
+model = dict(type='PFLD',
+             backbone=dict(type='PfldMobileNetV2',
+                           inchannel=3,
+                           layer1=[16, 16, 16, 16, 16],
+                           layer2=[32, 32, 32, 32, 32, 32],
+                           out_channel=16),
+             head=dict(
+                 type='PFLDhead',
+                 num_point=num_classes,
+                 input_channel=16,
+             ),
+             loss_cfg=dict(type='PFLDLoss'))
+
+
+# dataset settings
+dataset_type = 'MeterData'
+
+data_root = '../work_dirs/datasets/meter'
+height=112
+width=112
+batch_size=32
+workers=4
+
+train_pipeline = [
+    dict(type="Resize", height=height, width=width, interpolation=0),
+    dict(type='ColorJitter', brightness=0.3, p=0.5),
+    # dict(type='GaussNoise'),
+    dict(type='MedianBlur', blur_limit=3, p=0.3),
+    dict(type='HorizontalFlip'),
+    dict(type='VerticalFlip'),
+    dict(type='Rotate'),
+    dict(type='Affine', translate_percent=[0.05, 0.1], p=0.6)
+]
+
+val_pipeline = [dict(type="Resize", height=height, width=width)]
+
+
+
+data = dict(
+    samples_per_gpu=batch_size,
+    workers_per_gpu=workers,
+    train=dict(type=dataset_type,
+               data_root=data_root,
+               index_file=r'train/annotations.txt',
+               pipeline=train_pipeline,
+               test_mode=False),
+    val=dict(type=dataset_type,
+             data_root=data_root,
+             index_file=r'val/annotations.txt',
+             pipeline=val_pipeline,
+             test_mode=True),
+    test=dict(type=dataset_type,
+              data_root=data_root,
+              index_file=r'val/annotations.txt',
+              pipeline=val_pipeline,
+              test_mode=True
+              # dataset_info={{_base_.dataset_info}}
+              ))
+
+
+lr=0.0001
+epochs=300
+evaluation = dict(save_best='loss')
+optimizer = dict(type='Adam', lr=lr, betas=(0.9, 0.99), weight_decay=1e-6)
+optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
+# learning policy
+lr_config = dict(policy='step',
+                 warmup='linear',
+                 warmup_iters=400,
+                 warmup_ratio=0.0001,
+                 step=[400, 440, 490])
+total_epochs = epochs
+find_unused_parameters = True
+```
+save as EdgeLab/configs/pfld/pfld_mv2n_112_custom.py
+
+
 #### Download the pre-trained model.
 ```bash
 cd EdgeLab

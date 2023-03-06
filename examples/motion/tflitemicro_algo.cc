@@ -98,7 +98,14 @@ extern "C" int tflitemicro_algo_init()
 extern "C" int tflitemicro_algo_run(float *data)
 {
 
-    memcpy(input->data.f, data, input->bytes);
+    // Copy data into input tensor
+
+    for (size_t i = 0; i < input->bytes; i++)
+    {
+        /* code */
+        input->data.int8[i] = (int8_t)((float)(data[i]) * input->params.scale + input->params.zero_point) - 128;
+    }
+
     uint32_t start_time = board_get_cur_us();
 
     // Run inference, and report any error
