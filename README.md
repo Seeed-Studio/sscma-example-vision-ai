@@ -2,15 +2,18 @@
 
 <div align="center">
   <img width="100%" src="https://user-images.githubusercontent.com/20147381/206665275-feceede2-c68c-4259-a4db-541b3bd25b2f.png">
-  <h3> <a href="https://edgelab.readthedocs.io/en/latest/"> Documentation </a> | <a href="https://edgelab.readthedocs.io/zh_CN/latest/"> 中文文档 </a>  </h3>
+  <h3> <a href="https://seeed-studio.github.io/EdgeLab/"> Documentation </a> | <a href="https://seeed-studio.github.io/EdgeLab/zh_cn"> 中文文档 </a>  </h3>
 </div>
 
 English | [简体中文](README_zh-CN.md)
 
-- [How to build the firmware](#how-to-build-the-firmware)
-- [How to flash the firmware](#how-to-flash-the-firmware)
-- [How to preview](#how-to-preview)
-- [Performance](#performance)
+- [EdgeLab Deployment on Grove Vision AI](#edgelab-deployment-on-grove-vision-ai)
+  - [How to build the firmware?](#how-to-build-the-firmware)
+  - [How to flash the firmware?](#how-to-flash-the-firmware)
+  - [How to view the camera stream? (Grove AI Family firmware)](#how-to-view-the-camera-stream-grove-ai-family-firmware)
+    - [Performance](#performance)
+  - [Contributing](#contributing)
+  - [License](#license)
 
 ## How to build the firmware?
 
@@ -122,7 +125,7 @@ The performance of the EdgeLab-related models, measured on different chipsets, i
 
 | Target | Model | Dataset | Input Resolution | Peak RAM |Inferencing  Time | F1 Score|Link|
 | ---- | -----| ---| ---| -----------| --------| --------| --------|
-| Grove Vision AI |          Meter         | [custom](https://files.seeedstudio.com/wiki/Edgelab/meter.zip)|112x112 (RGB)| 320KB |     500ms    |  97% |[pfld_meter_int8.tflite](./model_zone/pfld_meter_int8.tflite)|
+| Grove Vision AI |          Poninter Meter         | [custom](https://files.seeedstudio.com/wiki/Edgelab/meter.zip)|112x112 (RGB)| 320KB |     500ms    |  97% |[pfld_meter_int8.tflite](./model_zone/pfld_meter_int8.tflite)|
 | Grove Vision AI  |          Fomo          | [custom]()|96x96 (GRAY)| 244KB |    150ms    |  99.5%|[fomo_int8.tflite](./model_zone/fomo_mask_int8.tflite)|
 
 ## Contributing

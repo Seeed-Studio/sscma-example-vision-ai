@@ -1,15 +1,18 @@
 # EdgeLab 在 Grove Vision AI 上的部署
 <div align="center">
   <img width="100%" src="https://user-images.githubusercontent.com/20147381/206665275-feceede2-c68c-4259-a4db-541b3bd25b2f.png">
-  <h3> <a href="https://edgelab.readthedocs.io/en/latest/"> Documentation </a> | <a href="https://edgelab.readthedocs.io/zh_CN/latest/"> 中文文档 </a> </h3>
+  <h3> <a href="https://seeed-studio.github.io/EdgeLab/"> Documentation </a> | <a href="https://seeed-studio.github.io/EdgeLab/zh_cn"> 中文文档 </a>  </h3>
 </div>
 
 English | [简体中文](README_zh-CN.md)
 
-- [如何构建固件](#如何构建固件)
-- [如何烧录固件与模型](#如何烧录固件与模型)
-- [如何预览](#如何预览)
-- [性能](#性能)
+- [EdgeLab 在 Grove Vision AI 上的部署](#edgelab-在-grove-vision-ai-上的部署)
+  - [如何构建固件？](#如何构建固件)
+  - [如何烧录固件与模型？](#如何烧录固件与模型)
+  - [如何预览固件？](#如何预览固件)
+    - [性能](#性能)
+  - [贡献](#贡献)
+  - [许可证](#许可证)
 
 ## 如何构建固件？
 
@@ -115,7 +118,7 @@ python3 tools/ufconv/uf2conv.py -t 1 -c ./model_zone/ pfld_meter_int8.tflite -o 
 
 | Target | Model | Dataset | Input Resolution | Peak RAM |Inferencing Time | F1 Score|Link|
 | ---- | -----| ---| ---| -----------| --------| --------| --------|
-| Grove Vision AI | 仪表 | [自定义](https://files.seeedstudio.com/wiki/Edgelab/meter.zip)|112x112 (RGB)| 320KB | 500ms | 97%|[pfld_meter_int8.tflite](./model_zone/pfld_meter_int8.tflite)|
+| Grove Vision AI | 指针表 | [自定义](https://files.seeedstudio.com/wiki/Edgelab/meter.zip)|112x112 (RGB)| 320KB | 500ms | 97%|[pfld_meter_int8.tflite](./model_zone/pfld_meter_int8.tflite)|
 | Grove Vision AI | Fomo | [custom]()|96x96 (GRAY)| 244KB | 150ms | 99.5%|[fomo_int8.tflite](./model_zone/fomo_mask_int8.tflite)|
 
 ## 贡献
