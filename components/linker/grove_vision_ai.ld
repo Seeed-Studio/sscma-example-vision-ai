@@ -5,19 +5,23 @@
    due to CCM memory wrapping into upper addresses beyond its size
 */
 
-#define __ASSEMPLY__
 MEMORY {
-    ICCM0   : ORIGIN = 0x00000000, LENGTH = 0x00010000
-    ICCM1   : ORIGIN = 0x10000000, LENGTH = 0x00050000
-    SYSTEM0 : ORIGIN = 0x20010800, LENGTH = (0x2011d650 - 0x20010800)
-    VERSION : ORIGIN = 0x2011d650, LENGTH = (0x2011d670 - 0x2011d650)
-    DCCM    : ORIGIN = 0x80000000, LENGTH = 0x00040000
-    XCCM    : ORIGIN = 0x90000000, LENGTH = 0x00008000
-    YCCM    : ORIGIN = 0xa0000000, LENGTH = 0x00008000
-#ifdef FLASH_AS_SRAM
-    FLASH		: ORIGIN = FLASH_SECTOR_START, LENGTH = 0x00300000
-#endif
+	ICCM0   : ORIGIN = 0x00000000, LENGTH = 0x00010000
+	ICCM1   : ORIGIN = 0x10000000, LENGTH = 0x00050000
+	BOOT	: ORIGIN = 0x20000000, LENGTH = 0x00020800
+	SYSTEM0 : ORIGIN = 0x20020800, LENGTH = 0x0015f800
+	DCCM    : ORIGIN = 0x80000000, LENGTH = 0x0003E000
+    .stack	: ORIGIN = 0x8003E000, LENGTH = 0x00002000
+	XCCM    : ORIGIN = 0x90000000, LENGTH = 0x00008000
+	YCCM    : ORIGIN = 0xa0000000, LENGTH = 0x00008000
 }
+
+REGION_ALIAS("startup", ICCM1)
+REGION_ALIAS("text", ICCM1)
+REGION_ALIAS("readonly", SYSTEM0)
+REGION_ALIAS("data", SYSTEM0)
+REGION_ALIAS("sdata", SYSTEM0)
+
 
 ENTRY(_arc_reset)
 
@@ -27,21 +31,21 @@ SECTIONS {
     {
         *(.init_vector)
         *(.init_bootstrap)
-    } > ICCM1
+    } > startup
 
-    .vector : ALIGN(1024)
+    .vector :
     {
         . = ALIGN(1024);
         *(.vector)
-    } > ICCM1
+    } > startup
 
     /* Read-only sections, merged into text segment: */
-    .hash          : { *(.hash)		}
-    .dynsym        : { *(.dynsym)		}
-    .dynstr        : { *(.dynstr)		}
-    .gnu.version   : { *(.gnu.version)	}
-    .gnu.version_d   : { *(.gnu.version_d)	}
-    .gnu.version_r   : { *(.gnu.version_r)	}
+    .hash          : { *(.hash)         }
+    .dynsym        : { *(.dynsym)       }
+    .dynstr        : { *(.dynstr)       }
+    .gnu.version   : { *(.gnu.version)  }
+    .gnu.version_d   : { *(.gnu.version_d)  }
+    .gnu.version_r   : { *(.gnu.version_r)  }
     .rel.init       : { *(.rel.init) }
     .rela.init      : { *(.rela.init) }
     .rel.text       : { *(.rel.text .rel.text.* .rel.gnu.linkonce.t.*) }
@@ -52,10 +56,10 @@ SECTIONS {
     .rela.rodata    : { *(.rela.rodata .rela.rodata.* .rela.gnu.linkonce.r.*) }
     .rel.data       : { *(.rel.data .rel.data.* .rel.gnu.linkonce.d.*) }
     .rela.data      : { *(.rela.data .rela.data.* .rela.gnu.linkonce.d.*) }
-    .rel.tdata	  : { *(.rel.tdata .rel.tdata.* .rel.gnu.linkonce.td.*) }
-    .rela.tdata	  : { *(.rela.tdata .rela.tdata.* .rela.gnu.linkonce.td.*) }
-    .rel.tbss	  : { *(.rel.tbss .rel.tbss.* .rel.gnu.linkonce.tb.*) }
-    .rela.tbss	  : { *(.rela.tbss .rela.tbss.* .rela.gnu.linkonce.tb.*) }
+    .rel.tdata    : { *(.rel.tdata .rel.tdata.* .rel.gnu.linkonce.td.*) }
+    .rela.tdata       : { *(.rela.tdata .rela.tdata.* .rela.gnu.linkonce.td.*) }
+    .rel.tbss     : { *(.rel.tbss .rel.tbss.* .rel.gnu.linkonce.tb.*) }
+    .rela.tbss    : { *(.rela.tbss .rela.tbss.* .rela.gnu.linkonce.tb.*) }
     .rel.ctors      : { *(.rel.ctors) }
     .rela.ctors     : { *(.rela.ctors) }
     .rel.dtors      : { *(.rel.dtors) }
@@ -73,7 +77,7 @@ SECTIONS {
     .rel.bss        : { *(.rel.bss .rel.bss.* .rel.gnu.linkonce.b.*) }
     .rela.bss       : { *(.rela.bss .rela.bss.* .rela.gnu.linkonce.b.*) }
 
-    .text           : ALIGN(4)
+    .text           :
     {
         . = ALIGN(4);
         PROVIDE (_f_text = .);
@@ -95,64 +99,43 @@ SECTIONS {
         PROVIDE (_etext = .);
         PROVIDE (etext = .);
         PROVIDE (_e_text = .);
-    }  > ICCM1
+    }  > text
 
-#ifdef FLASH_AS_SRAM
-    #ifdef TFLITE_MICRO_YOLO_COCO
-        .rodata : ALIGN(4)
-		{
-			libtflitemicro_25.a:yolo_coco.o *(.rodata.yolo_coco_tflite)
-		}		> FLASH
-    #else
-		.rodata : ALIGN(4)
-		{
-			libtflitemicro_24.a:person_detect_model_data.o *(.rodata.g_person_detect_model_data)
-		}		> FLASH
-    #endif
-#endif
-
-    .tensor_arena : ALIGN(16)
-    {
-        _f_bss_tensor_arena = .;
-        *(.bss.tensor_arena)
-        _e_bss_tensor_arena = .;
-    }  > SYSTEM0
-
-    .cdm_buf : ALIGN(16)
-    {
-        _f_bss_cdm_buf = .;
-        *(.bss.cdm_buf)
-        _e_bss_cdm_buf = .;
-    }  > SYSTEM0
-
-    .jcr   : ALIGN(4)
+    .jcr   :
     {
         KEEP (*(.jcr))
-    } > DCCM
+    } > text
 
-    .eh_frame   : ALIGN(4)
+    .eh_frame   :
     {
         KEEP (*(.eh_frame))
-    } > DCCM
+    } > text
 
-    .gcc_except_table   : ALIGN(4)
+    .gcc_except_table   :
     {
         *(.gcc_except_table) *(.gcc_except_table.*)
-    } > DCCM
+    } > text
 
-    .plt   : ALIGN(4)
+    .plt   :
     {
         *(.plt)
-    } > DCCM
+    } > text
 
-    .jlitab   : ALIGN(4)
+    .jlitab   :
     {
         __JLI_TABLE__ = .;
         jlitab*.o:(.jlitab*) *(.jlitab*)
 
-    } > DCCM
+    } > text
 
-    .read_only_data   : ALIGN(4)
+    .ram_memory :
+    {
+        . = ALIGN(8);
+        *(.ram_memory*)
+    } > BOOT
+
+
+    .read_only_data   :
     {
         PROVIDE (_f_rodata = .);
         *(.rodata) *(.rodata.*) *(.gnu.linkonce.r.*)
@@ -161,26 +144,34 @@ SECTIONS {
         . = ALIGN(4);
         __CTOR_LIST__ = .;
         LONG((__CTOR_END__ - __CTOR_LIST__) / 4 - 2)
-        KEEP(*(SORT_BY_NAME(".ctors*")))
+        *(SORT_BY_NAME(".ctors*"))
         LONG(0)
         __CTOR_END__ = .;
 
         . = ALIGN(4);
         __init_array_start = .;
-        KEEP(*(SORT_BY_NAME(".init_array*")))
+        *(SORT_BY_NAME(".init_array*"))
         __init_array_end = .;
 
         . = ALIGN(4);
         __DTOR_LIST__ = .;
         LONG((__DTOR_END__ - __DTOR_LIST__) / 4 - 2)
-        KEEP(*(SORT_BY_NAME(".dtors*")))
+        *(SORT_BY_NAME(".dtors*"))
         LONG(0)
         __DTOR_END__ = .;
 
         PROVIDE (_e_rodata = .);
-    } > SYSTEM0
+    } > readonly
 
-    .data	  : ALIGN(4)
+    .tensor_arena :
+    {
+        _f_bss_tensor_arena = .;
+        .  = ALIGN(16);
+        KEEP(*(.tensor_arena*))
+        _e_bss_tensor_arena = .;
+    } > readonly
+
+    .data     :
     {
         /* Start of the data section image in ROM.  */
         PROVIDE (__data_image = .);
@@ -191,7 +182,7 @@ SECTIONS {
         KEEP (*(.data))
         *(.data.* .gnu.linkonce.d.*)
         SORT(CONSTRUCTORS)
-    	/* gcc uses crtbegin.o to find the start of
+        /* gcc uses crtbegin.o to find the start of
         the constructors, so we make sure it is
         first.  Because this is a wildcard, it
         doesn't matter if the user does not
@@ -212,20 +203,20 @@ SECTIONS {
         KEEP (*(EXCLUDE_FILE (*crtend*.o ) .dtors))
         KEEP (*(SORT(.dtors.*)))
         KEEP (*(.dtors))
-    }  > DCCM
+    }  > data
 
-    .got            :  ALIGN(4)
+    .got            :
     {
         *(.got.plt) *(.got)
-    }  > DCCM
+    }  > data
 
 
     /* We want the small data sections together, so single-instruction offsets
         can access them all, and initialized data all before uninitialized, so
         we can shorten the on-disk segment size.  */
-    .sdata          : ALIGN(8)
+    .sdata          :
     {
-        __SDATA_BEGIN__ = . ;
+        __SDATA_BEGIN__ = . + 0x100;
         _f_sdata = .;
         *(.sdata .sdata.* .gnu.linkonce.s.*)
         _edata  =  .;
@@ -235,9 +226,9 @@ SECTIONS {
         /* Global data not cleared after reset.  */
         *(.noinit*)
         . = ALIGN(32 / 8);
-    }  > DCCM
+    }  > sdata
 
-    .sbss_all           : ALIGN(4)
+    .sbss_all           :
     {
         PROVIDE (__sbss_start = .);
         PROVIDE (___sbss_start = .);
@@ -247,10 +238,9 @@ SECTIONS {
         PROVIDE (__sbss_end = .);
         PROVIDE (___sbss_end = .);
         *(.sbss2 .sbss2.* .gnu.linkonce.sb2.*)
-    }  > DCCM
+    }  > sdata
 
-
-    .bss_all           : ALIGN(4)
+    .bss_all           :
     {
         PROVIDE (_f_bss = .) ;
         *(.dynbss)
@@ -266,52 +256,31 @@ SECTIONS {
         PROVIDE (_e_bss = .) ;
     }  > SYSTEM0
 
-    .stack : ALIGN(8)
-    {
-        __start_stack = . ;
-        _f_stack = .;
-        . = . + _STACKSIZE;
-        _e_stack = .;
-        __end_stack = . ;
-    } > DCCM
-
-    .heap : ALIGN(8)
-    {
-        __start_heap = . ;
-        _f_heap = .;
-        . = . + _HEAPSIZE;
-        _e_heap = .;
-        __end_heap = . ;
-    } > DCCM
-
-    .Zdata : ALIGN(16)
+    .Zdata :
     {
         . = ALIGN(16);
-        *(.Zdata*)
-        /* PROVIDE (__start_heap = .); */
-        /* PROVIDE (_f_heap = .); */
+        KEEP (*(.Zdata*))
+        PROVIDE (__start_heap = .) ;
+        PROVIDE (_f_heap = .) ;
     }  > DCCM
 
-    .Xdata : ALIGN(4)
+    .Xdata :
     {
-        *(.Xdata*)
+        . = ALIGN(4);
+        KEEP (*(.Xdata*))
     }  > XCCM
 
-    .Ydata : ALIGN(4)
+    .Ydata :
     {
-        *(.Ydata*)
+        . = ALIGN(4);
+        KEEP (*(.Ydata*))
     }  > YCCM
 
-    .ver : ALIGN(16)
-    {
-        *(.data*)
-    }  > VERSION
+    PROVIDE (__stack_top = (ORIGIN (.stack) + LENGTH (.stack) - 1) & -4);
+    PROVIDE (__end_heap = ORIGIN (.stack));
 
-    /* PROVIDE (__stack_top = (ORIGIN (DCCM) + LENGTH (DCCM) - 1) & -4); */
-    /* PROVIDE (__end_heap = ORIGIN (DCCM) + LENGTH (DCCM) - 1); */
-
-    /* PROVIDE (_e_stack = (ORIGIN (DCCM) + LENGTH (DCCM) - 8192) & -4); */
-    /* PROVIDE (_e_heap = __end_heap); */
+    PROVIDE (_e_stack = __stack_top);
+    PROVIDE (_e_heap = __end_heap);
     PROVIDE (_load_addr_text = _f_text);
     PROVIDE (_load_addr_rodata = _f_rodata);
 
@@ -356,7 +325,5 @@ SECTIONS {
     .debug_macro    0 : { *(.debug_macro) }
     .debug_addr     0 : { *(.debug_addr) }
     /* ARC Extension Sections */
-    .arcextmap	  0 : { *(.arcextmap.*) }
+    .arcextmap    0 : { *(.arcextmap.*) }
 }
-
-
