@@ -88,11 +88,7 @@ std::forward_list<object_t> nms_get_obeject_topn(int8_t *dataset, uint16_t top_n
                 if (max < dataset[i * num_element + OBJECT_T_INDEX + j])
                 {
                     max = dataset[i * num_element + OBJECT_T_INDEX + j];
-                    // TODO 目前未知情况安排再了 00 index1， 所以这里需要减去1， 后续要修改
-                    if (j == 1)
-                        obj.target = 10;
-                    if (j > 1)
-                        obj.target = j - 1;
+                    obj.target = j;
                 }
             }
 
