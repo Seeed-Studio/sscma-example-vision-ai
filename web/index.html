@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <title>SenseCAP Vision AI</title>
+    <script src="serial.js"></script>
+    <script src="application.js"></script>
+    <link rel="stylesheet" href="application.css">
+    <link rel="icon" type="image/x-icon" href="https://media-cdn.seeedstudio.com/media/favicon/stores/4/favo_3.ico" />
+</head>
+
+<body>
+    <div class="body">
+        <img class="main-title" src="https://media-cdn.seeedstudio.com/media/logo/stores/4/logo_2018_horizontal.png"
+            alt="" width="20%" />
+        <div class="main-content">
+            <div class="content">
+                <div id="configGroup" class="config-group">
+                    <div class="config-item">
+                        <button id="connect" class="button gary connect" onclick="connectOnclick()">Connect</button>
+                        <!-- <button id="rotation" class="rotation_button" onclick="rotationOnclick()"></button> -->
+                    </div>
+                    <div class="config-item">
+                        <img class="config-logo" src="./location-blue.svg" />
+                        <div id="centerPoint" class="set-point" onclick="pointConfigOnclick('center')">Set Center Point
+                        </div>
+                        <span class="config-text">X:</span>
+                        <input id="centerX" class="config-input" type="text" value="" placeholder="0"
+                            onchange="handleInputChange(event)" />
+                        <span class="config-text">Y:</span>
+                        <input id="centerY" class="config-input" type="text" value="" placeholder="0"
+                            onchange="handleInputChange(event)" />
+                    </div>
+                    <div class="config-item">
+                        <img class="config-logo" src="./location-green.svg" />
+                        <div id="startPoint" class="set-point" onclick="pointConfigOnclick('start')">Set Start Point
+                        </div>
+                        <span class="config-text">X:</span>
+                        <input id="startX" class="config-input" type="text" value="" placeholder="0"
+                            onchange="handleInputChange(event)" />
+                        <span class="config-text">Y:</span>
+                        <input id="startY" class="config-input" type="text" value="" placeholder="0"
+                            onchange="handleInputChange(event)" />
+                    </div>
+                    <div class="config-item">
+                        <img class="config-logo" src="./location-red.svg" />
+                        <div id="endPoint" class="set-point" onclick="pointConfigOnclick('end')">Set End Point</div>
+                        <span class="config-text">X:</span>
+                        <input id="endX" class="config-input" type="text" value="" placeholder="0"
+                            onchange="handleInputChange(event)" />
+                        <span class="config-text">Y:</span>
+                        <input id="endY" class="config-input" type="text" value="" placeholder="0"
+                            onchange="handleInputChange(event)" />
+                    </div>
+                    <div class="config-item">
+                        <div class="config-logo"></div>
+                        <div class="set-point" style="cursor: unset;">Measuring Range</div>
+                        <span class="config-text">From:</span>
+                        <input id="from" class="config-input" type="text" value="" placeholder="0"
+                            onchange="handleInputChange(event)" />
+                        <span class="config-text">To:</span>
+                        <input id="to" class="config-input" type="text" value="" placeholder="0"
+                            onchange="handleInputChange(event)" />
+                    </div>
+                    <div class="config-item">
+                        <div class="config-logo"></div>
+                        <div class="set-point" style="cursor: unset;">Decimal Places</div>
+                        <select class="config-select" name="select" onchange="handleSelectChange(event)">
+                            <option value="1">1</option>
+                            <option value="2" selected>2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                        </select>
+                    </div>
+                    <!-- <div class="button-group">
+                        <button class="button green">Configurate</button>
+                        <button class="button gary">Reset All</button>
+                    </div> -->
+                </div>
+                <div class="result-group">
+                    <!-- <div class="result-des">Al Model: Meter Detection</div> -->
+                    <div id="outdiv" class="vedio-frame" onclick="rectClick(event)">
+                        <canvas id="myCavans" class="canvas"></canvas>
+                        <!--加载动画-->
+                        <div class="spinner" id="loading">
+                            <div class="double-bounce1"></div>
+                            <div class="double-bounce2"></div>
+                        </div>
+                    </div>
+                    <div id="resultGroup" class="result-score">Result:<span id="result"></span></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>
