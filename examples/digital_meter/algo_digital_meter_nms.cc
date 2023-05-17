@@ -13,6 +13,12 @@ static bool _object_count_comparator_reverse(object_t &oa, object_t &ob)
     return oa.confidence < ob.confidence;
 }
 
+static bool _object_nms_comparator(object_t &oa, object_t &ob)
+{
+    return oa.confidence > ob.confidence;
+}
+
+
 static bool _object_count_comparator(object_t &oa, object_t &ob)
 {
     return oa.x < ob.x;
@@ -38,7 +44,7 @@ void _hard_nms_obeject_count(std::forward_list<object_t> &object_count_list, uin
 {
     object_t max_box;
     std::forward_list<object_t>::iterator max_box_obj;
-    object_count_list.sort(_object_count_comparator);
+    object_count_list.sort(_object_nms_comparator);
     for (std::forward_list<object_t>::iterator it = object_count_list.begin(); it != object_count_list.end(); ++it)
     {
         uint16_t area = it->w * it->h;

@@ -63,7 +63,7 @@ extern "C" void DebugLog(const char *s) { xprintf("%s", s); } //{ fprintf(stderr
 
 #define MODEL_INDEX 1
 #define ALGORITHM_INDEX 4
-#define IOU 45
+#define IOU 20
 #define CONFIDENCE 50
 #define IMG_PREVIEW_MAX_SIZE 20
 #define IMAGE_PREIVEW_ELEMENT_NUM 6
