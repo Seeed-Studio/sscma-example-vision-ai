@@ -53,29 +53,23 @@ git clone https://github.com/Seeed-Studio/edgelab-example-vision-ai
 cd edgelab-example-vision-ai
 ```
 
-- **第6步：**下载相关的第三方，tflite模型和库数据（只需要下载一次）。
-
-```sh
-make download
-```
-
-- **第7步：**编译固件
+- **第6步：**编译固件
 
 ``sh
 make HW=grove_vision_ai APP=meter # APP参数是examples/下的目录名称。
 制作flash
 ```
 
-这将在**tools/image_gen_cstm/output/**目录下产生**output.img**。
+这将在 **tools/image_gen_cstm/output/** 目录下产生 **output.img**。
 
 
-- **第8步：**生成固件镜像**firmware.uf2**文件
+- **第7步:** 生成固件镜像**firmware.uf2**文件
 
 ```sh
 python3 tools/ufconv/uf2conv.py -t 0 -c tools/image_gen_cstm/output/output.img -o firmware.uf2
 ```
 
-- **Step 9:** 将 meter.tflite 转换为 **model.uf2** 格式
+- **第8步:** 将 meter.tflite 转换为 **model.uf2** 格式
 
 ```sh
 python3 tools/ufconv/uf2conv.py -t 1 -c ./model_zone/ pfld_meter_int8.tflite -o model.uf2

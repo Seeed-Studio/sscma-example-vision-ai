@@ -12,7 +12,7 @@ SDK_LOC = .
 SDK_NAME = vision_ai_sdk_v01.zip
 
 
-APP?=meter
+APP?=fomo
 HW?=grove_vision_ai
 ##
 # root dir of embARC
@@ -21,11 +21,11 @@ EMBARC_ROOT = .
 COMPONENT_ROOT = components
 APP_ROOT ?= ./examples/$(APP)
 
-download:
-	@echo 'downloading'
-	@$(DL) $(SDK_LINK)  -o $(SDK_NAME)
-	@$(UNZIP) -o $(SDK_NAME) -d $(SDK_LOC) 
-	@$(RM) $(SDK_NAME)
+# download:
+# 	@echo 'downloading'
+# 	@$(DL) $(SDK_LINK)  -o $(SDK_NAME)
+# 	@$(UNZIP) -o $(SDK_NAME) -d $(SDK_LOC) 
+# 	@$(RM) $(SDK_NAME)
 
 
 #user define linker script

@@ -56,13 +56,8 @@ git clone https://github.com/Seeed-Studio/edgelab-example-vision-ai
 cd edgelab-example-vision-ai
 ```
 
-- **Step 6:** Download related third party, tflite model and library data (only need to download once)
 
-```sh
-make download
-```
-
-- **Step 7:** Compile the firmware
+- **Step 6:** Compile the firmware
 
 ```sh
 make HW=grove_vision_ai APP=meter # APP argument is the directory name under examples/
@@ -72,13 +67,13 @@ make flash
 This will generate **output.img** inside **tools/image_gen_cstm/output/** directory
 
 
-- **Step 8:** Generate firmware image **firmware.uf2** file
+- **Step 7:** Generate firmware image **firmware.uf2** file
 
 ```sh
 python3 tools/ufconv/uf2conv.py -t 0 -c tools/image_gen_cstm/output/output.img -o firmware.uf2
 ```
 
-- **Step 9:** Convert pre-trained model meter.tflite to **model.uf2** file
+- **Step 8:** Convert pre-trained model meter.tflite to **model.uf2** file
 
 ```sh
 python3 tools/ufconv/uf2conv.py -t 1 -c ../model_zone/pfld_meter_int8.tflite -o model.uf2

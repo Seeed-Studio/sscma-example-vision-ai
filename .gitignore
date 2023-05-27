@@ -2,11 +2,11 @@
 .vscode
 
 # SDK
-himax_we1_sdk/
+#himax_we1_sdk/
 obj_socket_24/
-tensorflow/
-third_party/
-tools/
+#tensorflow/
+#third_party/
+tools/image_gen_cstm/output/
 
 # export format
 *.uf2
