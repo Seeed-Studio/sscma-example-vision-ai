@@ -111,6 +111,7 @@ TfLiteRegistration Register_SPLIT_V();
 TfLiteRegistration Register_SQRT();
 TfLiteRegistration Register_SQUARE();
 TfLiteRegistration Register_STRIDED_SLICE();
+TfLiteRegistration Register_SLICE();
 TfLiteRegistration Register_SUB();
 TfLiteRegistration Register_UNPACK();
 TfLiteRegistration Register_L2_NORMALIZATION();

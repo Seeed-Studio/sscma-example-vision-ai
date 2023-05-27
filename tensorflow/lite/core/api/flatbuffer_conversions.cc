@@ -2010,6 +2010,11 @@ TfLiteStatus ParseSquare(const Operator*, ErrorReporter*, BuiltinDataAllocator*,
   return kTfLiteOk;
 }
 
+TfLiteStatus ParseSlice(const Operator*, ErrorReporter*, BuiltinDataAllocator*,
+                         void**) {
+  return kTfLiteOk;
+}
+
 TfLiteStatus ParseStridedSlice(const Operator* op,
                                ErrorReporter* error_reporter,
                                BuiltinDataAllocator* allocator,

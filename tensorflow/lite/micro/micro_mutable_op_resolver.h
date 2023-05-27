@@ -492,6 +492,12 @@ class MicroMutableOpResolver : public MicroOpResolver {
                       ParseStridedSlice);
   }
 
+  TfLiteStatus AddSlice() {
+    return AddBuiltin(BuiltinOperator_SLICE,
+                      tflite::ops::micro::Register_SLICE(),
+                      ParseSlice);
+  }
+
   TfLiteStatus AddSub() {
     return AddBuiltin(BuiltinOperator_SUB, tflite::ops::micro::Register_SUB(),
                       ParseSub);

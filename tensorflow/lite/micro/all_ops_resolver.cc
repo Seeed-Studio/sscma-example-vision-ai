@@ -86,6 +86,7 @@ AllOpsResolver::AllOpsResolver() {
   AddSqrt();
   AddSquare();
   AddSqueeze();
+  AddSlice();
   AddStridedSlice();
   AddSub();
   AddSvdf();
