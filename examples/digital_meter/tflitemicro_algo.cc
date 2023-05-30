@@ -14,7 +14,7 @@
 
 #include "tflitemicro_algo.h"
 
-#include "tensorflow/lite/micro/micro_error_reporter.h"
+#include "tensorflow/lite/micro/micro_log.h"
 #include "tensorflow/lite/micro/micro_interpreter.h"
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
 #include "tensorflow/lite/micro/system_setup.h"
@@ -32,7 +32,6 @@
 // Globals, used for compatibility with Arduino-style sketches.
 namespace
 {
-    tflite::ErrorReporter *error_reporter = nullptr;
     const tflite::Model *model = nullptr;
     tflite::MicroInterpreter *interpreter = nullptr;
     TfLiteTensor *input = nullptr;
@@ -74,9 +73,9 @@ extern "C" int tflitemicro_algo_init()
 {
     int ercode = 0;
 
-    static tflite::MicroErrorReporter micro_error_reporter;
-    error_reporter = &micro_error_reporter;
-    uint32_t model_addr = 0x30300000;
+    // static tflite::ErrorReporter micro_error_reporter;
+    // error_reporter = &micro_error_reporter;
+    uint32_t model_addr = 0x30200000;
     // The new version of the model skips the header information
     if ((*(uint32_t *)model_addr & 0xFFFFFF00) == MODEL_MAGIC_NUM)
     {
@@ -86,17 +85,18 @@ extern "C" int tflitemicro_algo_init()
 
     if (model->version() != TFLITE_SCHEMA_VERSION)
     {
-        TF_LITE_REPORT_ERROR(error_reporter,
-                             "Model provided is schema version %d not equal "
-                             "to supported version %d.",
-                             model->version(), TFLITE_SCHEMA_VERSION);
+        // TF_LITE_REPORT_ERROR(error_reporter,
+        //                      "Model provided is schema version %d not equal "
+        //                      "to supported version %d.",
+        //                      model->version(), TFLITE_SCHEMA_VERSION);
         return -1;
     }
 
-    static tflite::MicroMutableOpResolver<14> micro_op_resolver;
+    static tflite::MicroMutableOpResolver<17> micro_op_resolver;
     micro_op_resolver.AddConv2D();
     micro_op_resolver.AddReshape();
     micro_op_resolver.AddPad();
+    micro_op_resolver.AddPadV2();
     micro_op_resolver.AddAdd();
     micro_op_resolver.AddSub();
     micro_op_resolver.AddRelu();
@@ -105,20 +105,22 @@ extern "C" int tflitemicro_algo_init()
     micro_op_resolver.AddQuantize();
     micro_op_resolver.AddTranspose();
     micro_op_resolver.AddLogistic();
+    micro_op_resolver.AddSplitV();
     micro_op_resolver.AddMul();
     micro_op_resolver.AddStridedSlice();
+    micro_op_resolver.AddSlice();
     micro_op_resolver.AddResizeNearestNeighbor();
 
     // Build an interpreter to run the model with.
     // NOLINTNEXTLINE(runtime-global-variables)
     static tflite::MicroInterpreter static_interpreter(
-        model, micro_op_resolver, tensor_arena, kTensorArenaSize, error_reporter);
+        model, micro_op_resolver, tensor_arena, kTensorArenaSize);
     interpreter = &static_interpreter;
     // Allocate memory from the tensor_arena for the model's tensors.
     TfLiteStatus allocate_status = interpreter->AllocateTensors();
     if (allocate_status != kTfLiteOk)
     {
-        TF_LITE_REPORT_ERROR(error_reporter, "AllocateTensors() failed");
+        // TF_LITE_REPORT_ERROR(error_reporter, "AllocateTensors() failed");
         return -1;
     }
     // Get information about the memory area to use for the model's input.
@@ -146,7 +148,7 @@ extern "C" int tflitemicro_algo_run(uint32_t img, uint32_t ow, uint32_t oh)
     TfLiteStatus invoke_status = interpreter->Invoke();
     if (invoke_status != kTfLiteOk)
     {
-        TF_LITE_REPORT_ERROR(error_reporter, "Invoke failed.");
+        MicroPrintf("Invoke failed.");
         return -1;
     }
 
@@ -158,24 +160,52 @@ extern "C" int tflitemicro_algo_run(uint32_t img, uint32_t ow, uint32_t oh)
     uint32_t num_class = output->dims->data[2] - OBJECT_T_INDEX;
     int16_t num_element = num_class + OBJECT_T_INDEX;
 
-    _digital_meter_list.clear();
-
-    _digital_meter_list = nms_get_obeject_topn(output->data.int8, records, CONFIDENCE, IOU, w, h, records, num_class, scale, zero_point);
-
-    uint32_t tmp_value = 0;
-    uint32_t tmp_place = 1;
-    for (auto &obj : _digital_meter_list)
+#if 1
+    logger("scale: %d, zero_point: %d, records: %d, num_class: %d, num_element: %d\n", int(scale * 10000), zero_point, records, num_class, num_element);
+    for (int i = 0; i < records; i++)
     {
-        if (obj.target > 9) // use old value
+        float confidence = float(output->data.int8[i * num_element + OBJECT_C_INDEX] - zero_point) * scale;
+        if (confidence > 50)
         {
-            tmp_value = tmp_value * 10 + ((value / tmp_place) % 10);
-            continue;
-        }
-        tmp_value = tmp_value * 10 + obj.target;
-        tmp_place *= 10;
-    }
+            logger("confidence: %d->%d\n", output->data.int8[i * num_element + OBJECT_C_INDEX], int(confidence));
+            int8_t max = -128;
+            int target = 0;
+            for (int j = 0; j < num_class; j++)
+            {
+                if (max < output->data.int8[i * num_element + OBJECT_T_INDEX + j])
+                {
+                    max = output->data.int8[i * num_element + OBJECT_T_INDEX + j];
+                    target = j;
+                }
+            }
+            int x = int(float(float(output->data.int8[i * num_element + OBJECT_X_INDEX] - zero_point) * scale));
+            int y = int(float(float(output->data.int8[i * num_element + OBJECT_Y_INDEX] - zero_point) * scale));
+            int w = int(float(float(output->data.int8[i * num_element + OBJECT_W_INDEX] - zero_point) * scale));
+            int h = int(float(float(output->data.int8[i * num_element + OBJECT_H_INDEX] - zero_point) * scale));
 
-    value = tmp_value;
+            // logger("index: %d target: %d max: %d confidence: %d box{x: %d, y: %d, w: %d, h: %d}\n", i, target, max, int((float)confidence * 100), x, y, w, h);
+        }
+    }
+#endif
+
+    // _digital_meter_list.clear();
+
+    // _digital_meter_list = nms_get_obeject_topn(output->data.int8, records, CONFIDENCE, IOU, w, h, records, num_class, scale, zero_point);
+
+    // uint32_t tmp_value = 0;
+    // uint32_t tmp_place = 1;
+    // for (auto &obj : _digital_meter_list)
+    // {
+    //     if (obj.target > 9) // use old value
+    //     {
+    //         tmp_value = tmp_value * 10 + ((value / tmp_place) % 10);
+    //         continue;
+    //     }
+    //     tmp_value = tmp_value * 10 + obj.target;
+    //     tmp_place *= 10;
+    // }
+
+    value = 0;
 
     return 0;
 }

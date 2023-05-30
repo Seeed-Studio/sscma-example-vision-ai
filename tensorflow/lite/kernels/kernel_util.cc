@@ -25,8 +25,9 @@ limitations under the License.
 #include <string>
 #endif  // TF_LITE_STATIC_MEMORY
 
-#include "tensorflow/lite/c/builtin_op_data.h"
-#include "tensorflow/lite/c/common.h"
+#include "tensorflow/lite/context_util.h"
+#include "tensorflow/lite/core/c/builtin_op_data.h"
+#include "tensorflow/lite/core/c/common.h"
 #include "tensorflow/lite/kernels/internal/cppmath.h"
 #include "tensorflow/lite/kernels/internal/quantization_util.h"
 
@@ -119,6 +120,7 @@ TfLiteStatus GetInputSafe(const TfLiteContext* context, const TfLiteNode* node,
 TfLiteTensor* GetVariableInput(TfLiteContext* context, const TfLiteNode* node,
                                int index) {
   TfLiteTensor* tensor = GetMutableInput(context, node, index);
+  if (tensor == nullptr) return nullptr;
   return tensor->is_variable ? tensor : nullptr;
 }
 
@@ -234,7 +236,8 @@ TfLiteStatus PopulateConvolutionQuantizationParams(
     //  Currently only Int8/Int16 is supported for per channel quantization.
     TF_LITE_ENSURE(context,
                    input->type == kTfLiteInt8 || input->type == kTfLiteInt16);
-    TF_LITE_ENSURE_EQ(context, filter->type, kTfLiteInt8);
+    TF_LITE_ENSURE(context,
+                   filter->type == kTfLiteInt8 || filter->type == kTfLiteInt4);
     TF_LITE_ENSURE_EQ(context, affine_quantization->scale->size, num_channels);
     TF_LITE_ENSURE_EQ(
         context, num_channels,
@@ -409,6 +412,24 @@ bool HaveSameShapes(const TfLiteTensor* input1, const TfLiteTensor* input2) {
 }
 
 #ifndef TF_LITE_STATIC_MEMORY
+TfLiteStatus GetOutputShapeFromInput(TfLiteContext* context,
+                                     const TfLiteTensor* input,
+                                     TfLiteIntArray** output_shape) {
+  if (NumDimensions(input) != 1) {
+    TF_LITE_KERNEL_LOG(const_cast<TfLiteContext*>(context),
+                       "Invalid %dD input tensor (must be a 1D tensor).",
+                       NumDimensions(input));
+    return kTfLiteError;
+  }
+  const int output_dims = SizeOfDimension(input, 0);
+  std::unique_ptr<TfLiteIntArray, void (*)(TfLiteIntArray*)> shape(
+      TfLiteIntArrayCreate(output_dims), TfLiteIntArrayFree);
+  for (int i = 0; i < output_dims; i++) {
+    shape->data[i] = input->data.i32[i];
+  }
+  *output_shape = shape.release();
+  return kTfLiteOk;
+}
 
 // TODO(b/172067338): Having this function be part of TF_LITE_STATIC_MEMORY
 // build results in a 6KB size increase, even though the function is unsused for
@@ -421,9 +442,15 @@ std::string GetShapeDebugString(const TfLiteIntArray* shape) {
     if (str.empty())
       str = "[" + std::to_string(shape->data[d]);
     else
-      str += ", " + std::to_string(shape->data[d]);
+      // Don't add space after "," to make the output consistent with
+      // tensorflow::shape_inference::InferenceContext::DebugString()
+      str += "," + std::to_string(shape->data[d]);
   }
-  str += "]";
+  if (str.empty()) {
+    str = "[]";
+  } else {
+    str += "]";
+  }
   return str;
 }
 
@@ -431,30 +458,28 @@ TfLiteStatus CalculateShapeForBroadcast(TfLiteContext* context,
                                         const TfLiteTensor* input1,
                                         const TfLiteTensor* input2,
                                         TfLiteIntArray** output_shape) {
-  int dims1 = NumDimensions(input1);
-  int dims2 = NumDimensions(input2);
-  int out_dims = std::max(dims1, dims2);
-  if (NumElements(input1) == 0) {
-    *output_shape = TfLiteIntArrayCopy(input1->dims);
-    return kTfLiteOk;
-  }
-  if (NumElements(input2) == 0) {
-    *output_shape = TfLiteIntArrayCopy(input2->dims);
-    return kTfLiteOk;
-  }
+  const int dims1 = NumDimensions(input1);
+  const int dims2 = NumDimensions(input2);
+  const int out_dims = std::max(dims1, dims2);
+
   std::unique_ptr<TfLiteIntArray, void (*)(TfLiteIntArray*)> shape(
       TfLiteIntArrayCreate(out_dims), TfLiteIntArrayFree);
   for (int i = 0; i < out_dims; ++i) {
-    int d1 = i >= dims1 ? 1 : SizeOfDimension(input1, dims1 - i - 1);
-    int d2 = i >= dims2 ? 1 : SizeOfDimension(input2, dims2 - i - 1);
+    const int d1 = i >= dims1 ? 1 : SizeOfDimension(input1, dims1 - i - 1);
+    const int d2 = i >= dims2 ? 1 : SizeOfDimension(input2, dims2 - i - 1);
     if (!(d1 == d2 || d1 == 1 || d2 == 1)) {
-      context->ReportError(context,
-                           "Given shapes, %s and %s, are not broadcastable.",
-                           GetShapeDebugString(input1->dims).c_str(),
-                           GetShapeDebugString(input2->dims).c_str());
+      TF_LITE_KERNEL_LOG(context,
+                         "Given shapes, %s and %s, are not broadcastable.",
+                         GetShapeDebugString(input1->dims).c_str(),
+                         GetShapeDebugString(input2->dims).c_str());
       return kTfLiteError;
     }
-    shape->data[out_dims - i - 1] = std::max(d1, d2);
+
+    if (d1 == 0 || d2 == 0) {
+      shape->data[out_dims - i - 1] = 0;
+    } else {
+      shape->data[out_dims - i - 1] = std::max(d1, d2);
+    }
   }
   *output_shape = shape.release();
   return kTfLiteOk;
@@ -465,24 +490,27 @@ TfLiteStatus CalculateShapeForBroadcast(TfLiteContext* context,
                                         const TfLiteTensor* input2,
                                         const TfLiteTensor* input3,
                                         TfLiteIntArray** output_shape) {
-  int dims1 = NumDimensions(input1);
-  int dims2 = NumDimensions(input2);
-  int dims3 = NumDimensions(input3);
-  int out_dims = std::max(std::max(dims1, dims2), dims3);
+  const int dims1 = NumDimensions(input1);
+  const int dims2 = NumDimensions(input2);
+  const int dims3 = NumDimensions(input3);
+  const int out_dims = std::max(std::max(dims1, dims2), dims3);
   std::unique_ptr<TfLiteIntArray, void (*)(TfLiteIntArray*)> shape(
       TfLiteIntArrayCreate(out_dims), TfLiteIntArrayFree);
   for (int i = 0; i < out_dims; ++i) {
-    int d1 = i >= dims1 ? 1 : SizeOfDimension(input1, dims1 - i - 1);
-    int d2 = i >= dims2 ? 1 : SizeOfDimension(input2, dims2 - i - 1);
-    int d3 = i >= dims3 ? 1 : SizeOfDimension(input3, dims3 - i - 1);
+    const int d1 = i >= dims1 ? 1 : SizeOfDimension(input1, dims1 - i - 1);
+    const int d2 = i >= dims2 ? 1 : SizeOfDimension(input2, dims2 - i - 1);
+    const int d3 = i >= dims3 ? 1 : SizeOfDimension(input3, dims3 - i - 1);
+    const int min_value = std::min(std::min(d1, d2), d3);
     int max_value = std::max(std::max(d1, d2), d3);
+    // If one dimention is 0, others must be 0 or 1.
+    if (min_value == 0) max_value = 0;
     if (!(d1 == 1 || d1 == max_value) || !(d2 == 1 || d2 == max_value) ||
         !(d3 == 1 || d3 == max_value)) {
-      context->ReportError(
-          context, "Given shapes, %s, %s and %s, are not broadcastable.",
-          GetShapeDebugString(input1->dims).c_str(),
-          GetShapeDebugString(input2->dims).c_str(),
-          GetShapeDebugString(input3->dims).c_str());
+      TF_LITE_KERNEL_LOG(context,
+                         "Given shapes, %s, %s and %s, are not broadcastable.",
+                         GetShapeDebugString(input1->dims).c_str(),
+                         GetShapeDebugString(input2->dims).c_str(),
+                         GetShapeDebugString(input3->dims).c_str());
       return kTfLiteError;
     }
     shape->data[out_dims - i - 1] = max_value;
@@ -496,42 +524,45 @@ TfLiteStatus CalculateShapeForBroadcast(TfLiteContext* context,
 int TfLiteTypeGetSize(TfLiteType type) {
   switch (type) {
     case kTfLiteUInt8:
-      TF_LITE_ASSERT_EQ(sizeof(uint8_t), 1);
+      static_assert(sizeof(uint8_t) == 1, "");
       return 1;
     case kTfLiteInt8:
-      TF_LITE_ASSERT_EQ(sizeof(int8_t), 1);
+      static_assert(sizeof(int8_t) == 1, "");
       return 1;
     case kTfLiteBool:
       return sizeof(bool);
+    case kTfLiteUInt16:
+      static_assert(sizeof(uint16_t) == 2, "");
+      return 2;
     case kTfLiteInt16:
-      TF_LITE_ASSERT_EQ(sizeof(int16_t), 2);
+      static_assert(sizeof(int16_t) == 2, "");
       return 2;
     case kTfLiteFloat16:
-      TF_LITE_ASSERT_EQ(sizeof(int16_t), 2);
+      static_assert(sizeof(int16_t) == 2, "");
       return 2;
     case kTfLiteFloat32:
-      TF_LITE_ASSERT_EQ(sizeof(float), 4);
+      static_assert(sizeof(float) == 4, "");
       return 4;
     case kTfLiteInt32:
-      TF_LITE_ASSERT_EQ(sizeof(int32_t), 4);
+      static_assert(sizeof(int32_t) == 4, "");
       return 4;
     case kTfLiteUInt32:
-      TF_LITE_ASSERT_EQ(sizeof(uint32_t), 4);
+      static_assert(sizeof(uint32_t) == 4, "");
       return 4;
     case kTfLiteInt64:
-      TF_LITE_ASSERT_EQ(sizeof(int64_t), 8);
+      static_assert(sizeof(int64_t) == 8, "");
       return 8;
     case kTfLiteUInt64:
-      TF_LITE_ASSERT_EQ(sizeof(uint64_t), 8);
+      static_assert(sizeof(uint64_t) == 8, "");
       return 8;
     case kTfLiteFloat64:
-      TF_LITE_ASSERT_EQ(sizeof(double), 8);
+      static_assert(sizeof(double) == 8, "");
       return 8;
     case kTfLiteComplex64:
-      TF_LITE_ASSERT_EQ(sizeof(std::complex<float>), 8);
+      static_assert(sizeof(std::complex<float>) == 8, "");
       return 8;
     case kTfLiteComplex128:
-      TF_LITE_ASSERT_EQ(sizeof(std::complex<double>), 16);
+      static_assert(sizeof(std::complex<double>) == 16, "");
       return 16;
     default:
       return 0;
@@ -546,6 +577,17 @@ bool IsMobilePlatform() {
   return true;
 #endif
 #endif
+  return false;
+}
+
+bool HasUnspecifiedDimension(const TfLiteTensor* tensor) {
+#ifndef TF_LITE_STATIC_MEMORY
+  if (tensor->dims_signature) {
+    for (int i : TfLiteIntArrayView(tensor->dims_signature)) {
+      if (i == -1) return true;
+    }
+  }
+#endif  // TF_LITE_STATIC_MEMORY
   return false;
 }
 

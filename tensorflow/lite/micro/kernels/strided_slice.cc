@@ -1,4 +1,4 @@
-/* Copyright 2018 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2023 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,11 +23,11 @@ limitations under the License.
 #include "tensorflow/lite/kernels/kernel_util.h"
 #include "tensorflow/lite/kernels/op_macros.h"
 #include "tensorflow/lite/micro/kernels/kernel_util.h"
+#include "tensorflow/lite/micro/micro_log.h"
 
 namespace tflite {
-namespace ops {
-namespace micro {
-namespace strided_slice {
+
+namespace {
 
 constexpr int kInputTensor = 0;
 constexpr int kBeginTensor = 1;
@@ -38,18 +38,27 @@ constexpr int kOutputTensor = 0;
 struct StridedSliceContext {
   StridedSliceContext(TfLiteContext* context, TfLiteNode* node) {
     params = reinterpret_cast<TfLiteStridedSliceParams*>(node->builtin_data);
-    input = GetInput(context, node, kInputTensor);
-    begin = GetInput(context, node, kBeginTensor);
-    end = GetInput(context, node, kEndTensor);
-    strides = GetInput(context, node, kStridesTensor);
-    output = GetOutput(context, node, kOutputTensor);
+    micro_context = GetMicroContext(context);
+    input = micro_context->AllocateTempInputTensor(node, kInputTensor);
+    begin = micro_context->AllocateTempInputTensor(node, kBeginTensor);
+    end = micro_context->AllocateTempInputTensor(node, kEndTensor);
+    strides = micro_context->AllocateTempInputTensor(node, kStridesTensor);
+    output = micro_context->AllocateTempOutputTensor(node, kOutputTensor);
     dims = NumDimensions(input);
   }
+  ~StridedSliceContext() {
+    micro_context->DeallocateTempTfLiteTensor(input);
+    micro_context->DeallocateTempTfLiteTensor(begin);
+    micro_context->DeallocateTempTfLiteTensor(end);
+    micro_context->DeallocateTempTfLiteTensor(strides);
+    micro_context->DeallocateTempTfLiteTensor(output);
+  }
   const TfLiteStridedSliceParams* params;
-  const TfLiteTensor* input;
-  const TfLiteTensor* begin;
-  const TfLiteTensor* end;
-  const TfLiteTensor* strides;
+  MicroContext* micro_context;
+  TfLiteTensor* input;
+  TfLiteTensor* begin;
+  TfLiteTensor* end;
+  TfLiteTensor* strides;
   TfLiteTensor* output;
   int dims;
 };
@@ -153,13 +162,6 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
                                   tflite::micro::GetTensorShape(output),
                                   tflite::micro::GetTensorData<float>(output));
       break;
-    case kTfLiteUInt8:
-      reference_ops::StridedSlice(
-          op_params, tflite::micro::GetTensorShape(input),
-          tflite::micro::GetTensorData<uint8_t>(input),
-          tflite::micro::GetTensorShape(output),
-          tflite::micro::GetTensorData<uint8_t>(output));
-      break;
     case kTfLiteInt8:
       reference_ops::StridedSlice(op_params,
                                   tflite::micro::GetTensorShape(input),
@@ -167,33 +169,39 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
                                   tflite::micro::GetTensorShape(output),
                                   tflite::micro::GetTensorData<int8_t>(output));
       break;
+    case kTfLiteInt16:
+      reference_ops::StridedSlice(
+          op_params, tflite::micro::GetTensorShape(input),
+          tflite::micro::GetTensorData<int16_t>(input),
+          tflite::micro::GetTensorShape(output),
+          tflite::micro::GetTensorData<int16_t>(output));
+      break;
     case kTfLiteInt32:
+      reference_ops::StridedSlice(
+          op_params, tflite::micro::GetTensorShape(input),
+          tflite::micro::GetTensorData<int32_t>(input),
+          tflite::micro::GetTensorShape(output),
+          tflite::micro::GetTensorData<int32_t>(output));
+      break;
+    case kTfLiteBool:
       reference_ops::StridedSlice(op_params,
                                   tflite::micro::GetTensorShape(input),
-                                  tflite::micro::GetTensorData<int8_t>(input),
+                                  tflite::micro::GetTensorData<bool>(input),
                                   tflite::micro::GetTensorShape(output),
-                                  tflite::micro::GetTensorData<int8_t>(output));
+                                  tflite::micro::GetTensorData<bool>(output));
       break;
     default:
-      TF_LITE_KERNEL_LOG(context, "Type %s (%d) not supported.",
-                         TfLiteTypeGetName(input->type), input->type);
+      MicroPrintf("Type %s (%d) not supported.", TfLiteTypeGetName(input->type),
+                  input->type);
       return kTfLiteError;
   }
   return kTfLiteOk;
 }
-}  // namespace strided_slice
 
-TfLiteRegistration Register_STRIDED_SLICE() {
-  return {/*init=*/strided_slice::Init,
-          /*free=*/nullptr,
-          /*prepare=*/strided_slice::Prepare,
-          /*invoke=*/strided_slice::Eval,
-          /*profiling_string=*/nullptr,
-          /*builtin_code=*/0,
-          /*custom_name=*/nullptr,
-          /*version=*/0};
+}  // namespace
+
+TfLiteRegistration_V1 Register_STRIDED_SLICE() {
+  return tflite::micro::RegisterOp(Init, Prepare, Eval);
 }
 
-}  // namespace micro
-}  // namespace ops
 }  // namespace tflite

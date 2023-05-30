@@ -24,7 +24,7 @@
 #include "sensor_core.h"
 #include "external_flash.h"
 
-char preview[1024];
+char preview[2048];
 
 ERROR_T hardware_init()
 {

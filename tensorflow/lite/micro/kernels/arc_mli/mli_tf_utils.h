@@ -20,6 +20,7 @@ limitations under the License.
 #include "tensorflow/lite/kernels/internal/common.h"
 #include "tensorflow/lite/kernels/internal/tensor_ctypes.h"
 #include "tensorflow/lite/micro/kernels/kernel_util.h"
+#include "tensorflow/lite/micro/micro_log.h"
 
 constexpr int kFracBitsQ15 = 15;
 constexpr int kFracBitsQ31 = 31;
@@ -36,7 +37,7 @@ inline void ConvertToMliTensorData(const TfLiteTensor* tfT, mli_tensor* mliT) {
   } else if (tfT->type == kTfLiteInt32) {
     mliT->el_type = MLI_EL_ASYM_I32;
   } else {
-    TF_LITE_FATAL("Wrong data type. Expected int8_t or int32_t.");
+    MicroPrintf("Wrong data type. Expected int8_t or int32_t.");
   }
 
   mliT->capacity = tfT->bytes;

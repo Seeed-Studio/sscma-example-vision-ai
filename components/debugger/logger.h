@@ -22,6 +22,7 @@ extern "C"
 #endif
 
 #include <stdint.h>
+#include "grove_ai_config.h"
 #include "hx_drv_timer.h"
 
 #define ERROR_FILE_MAGIC1 0xfb321e68

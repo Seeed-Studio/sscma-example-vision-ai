@@ -15,7 +15,7 @@ limitations under the License.
 
 #include "tensorflow/lite/micro/memory_planner/greedy_memory_planner.h"
 
-#include "tensorflow/lite/micro/micro_error_reporter.h"
+#include "tensorflow/lite/micro/micro_log.h"
 #include "tensorflow/lite/micro/micro_string.h"
 
 namespace tflite {
@@ -58,9 +58,14 @@ void ReverseSortInPlace(int* values, int* ids, int size) {
   } while (any_swapped);
 }
 
-GreedyMemoryPlanner::GreedyMemoryPlanner(unsigned char* scratch_buffer,
-                                         int scratch_buffer_size)
-    : buffer_count_(0), need_to_calculate_offsets_(true) {
+GreedyMemoryPlanner::GreedyMemoryPlanner() {}
+
+TfLiteStatus GreedyMemoryPlanner::Init(unsigned char* scratch_buffer,
+                                       int scratch_buffer_size) {
+  // Reset internal states
+  buffer_count_ = 0;
+  need_to_calculate_offsets_ = true;
+
   // Allocate the arrays we need within the scratch buffer arena.
   max_buffer_count_ = scratch_buffer_size / per_buffer_size();
 
@@ -78,18 +83,17 @@ GreedyMemoryPlanner::GreedyMemoryPlanner(unsigned char* scratch_buffer,
   next_free += sizeof(ListEntry) * max_buffer_count_;
 
   buffer_offsets_ = reinterpret_cast<int*>(next_free);
+  return kTfLiteOk;
 }
 
 GreedyMemoryPlanner::~GreedyMemoryPlanner() {
   // We don't own the scratch buffer, so don't deallocate anything.
 }
 
-TfLiteStatus GreedyMemoryPlanner::AddBuffer(
-    tflite::ErrorReporter* error_reporter, int size, int first_time_used,
-    int last_time_used) {
+TfLiteStatus GreedyMemoryPlanner::AddBuffer(int size, int first_time_used,
+                                            int last_time_used) {
   if (buffer_count_ >= max_buffer_count_) {
-    TF_LITE_REPORT_ERROR(error_reporter, "Too many buffers (max is %d)",
-                         max_buffer_count_);
+    MicroPrintf("Too many buffers (max is %d)", max_buffer_count_);
     return kTfLiteError;
   }
   BufferRequirements* current = &requirements_[buffer_count_];
@@ -102,12 +106,11 @@ TfLiteStatus GreedyMemoryPlanner::AddBuffer(
   return kTfLiteOk;
 }
 
-TfLiteStatus GreedyMemoryPlanner::AddBuffer(
-    tflite::ErrorReporter* error_reporter, int size, int first_time_used,
-    int last_time_used, int offline_offset) {
+TfLiteStatus GreedyMemoryPlanner::AddBuffer(int size, int first_time_used,
+                                            int last_time_used,
+                                            int offline_offset) {
   BufferRequirements* current = &requirements_[buffer_count_];
-  if (AddBuffer(error_reporter, size, first_time_used, last_time_used) !=
-      kTfLiteOk) {
+  if (AddBuffer(size, first_time_used, last_time_used) != kTfLiteOk) {
     return kTfLiteError;
   }
   current->offline_offset = offline_offset;
@@ -392,20 +395,19 @@ void GreedyMemoryPlanner::PrintMemoryPlan() {
 
 int GreedyMemoryPlanner::GetBufferCount() { return buffer_count_; }
 
-TfLiteStatus GreedyMemoryPlanner::GetOffsetForBuffer(
-    tflite::ErrorReporter* error_reporter, int buffer_index, int* offset) {
+TfLiteStatus GreedyMemoryPlanner::GetOffsetForBuffer(int buffer_index,
+                                                     int* offset) {
   CalculateOffsetsIfNeeded();
   if ((buffer_index < 0) || (buffer_index >= buffer_count_)) {
-    TF_LITE_REPORT_ERROR(error_reporter,
-                         "buffer index %d is outside range 0 to %d",
-                         buffer_index, buffer_count_);
+    MicroPrintf("buffer index %d is outside range 0 to %d", buffer_index,
+                buffer_count_);
     return kTfLiteError;
   }
   *offset = buffer_offsets_[buffer_index];
   return kTfLiteOk;
 }
 
-bool GreedyMemoryPlanner::DoAnyBuffersOverlap(ErrorReporter* error_reporter) {
+bool GreedyMemoryPlanner::DoAnyBuffersOverlap() {
   CalculateOffsetsIfNeeded();
   bool were_overlaps_found = false;
   for (int i = 0; i < buffer_count_; ++i) {
@@ -434,10 +436,10 @@ bool GreedyMemoryPlanner::DoAnyBuffersOverlap(ErrorReporter* error_reporter) {
         continue;
       }
       were_overlaps_found = true;
-      TF_LITE_REPORT_ERROR(
-          error_reporter, "Overlap: %d (%d=>%d, %d->%d) vs %d (%d=>%d, %d->%d)",
-          i, a_first_time_used, a_last_time_used, a_start_offset, a_end_offset,
-          j, b_first_time_used, b_last_time_used, b_start_offset, b_end_offset);
+      MicroPrintf("Overlap: %d (%d=>%d, %d->%d) vs %d (%d=>%d, %d->%d)", i,
+                  a_first_time_used, a_last_time_used, a_start_offset,
+                  a_end_offset, j, b_first_time_used, b_last_time_used,
+                  b_start_offset, b_end_offset);
     }
   }
   return were_overlaps_found;

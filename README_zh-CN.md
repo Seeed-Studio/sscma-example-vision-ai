@@ -40,22 +40,22 @@ wget https://github.com/foss-for-synopsys-dwc-arc-processors/toolchain/releases/
 tar -xvf arc_gnu_2020.09_prebuilt_elf32_le_linux_install.tar.gz
 ```
 
-- **第四步：**将**arc_gnu_2020.09_prebuilt_elf32_le_linux_install/bin**添加到**PATH**。
+- **Step 4：**将**arc_gnu_2020.09_prebuilt_elf32_le_linux_install/bin**添加到**PATH**。
 
-``sh
+```sh
 export PATH="$HOME/arc_gnu_2020.09_prebuilt_elf32_le_linux_install/bin:$PATH"
 ```
 
-- **第5步：**克隆以下版本库并进入该目录
+- **Step 5:** 克隆以下版本库并进入该目录
 
 ```sh
 git clone https://github.com/Seeed-Studio/edgelab-example-vision-ai
 cd edgelab-example-vision-ai
 ```
 
-- **第6步：**编译固件
+- **Step 6:** 编译固件
 
-``sh
+```sh
 make HW=grove_vision_ai APP=meter # APP参数是examples/下的目录名称。
 制作flash
 ```
@@ -63,13 +63,13 @@ make HW=grove_vision_ai APP=meter # APP参数是examples/下的目录名称。
 这将在 **tools/image_gen_cstm/output/** 目录下产生 **output.img**。
 
 
-- **第7步:** 生成固件镜像**firmware.uf2**文件
+- **Step 7:** 生成固件镜像**firmware.uf2**文件
 
 ```sh
 python3 tools/ufconv/uf2conv.py -t 0 -c tools/image_gen_cstm/output/output.img -o firmware.uf2
 ```
 
-- **第8步:** 将 meter.tflite 转换为 **model.uf2** 格式
+- **Step 8:** 将 meter.tflite 转换为 **model.uf2** 格式
 
 ```sh
 python3 tools/ufconv/uf2conv.py -t 1 -c ./model_zone/ pfld_meter_int8.tflite -o model.uf2
