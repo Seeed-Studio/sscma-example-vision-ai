@@ -18,7 +18,6 @@ static bool _object_nms_comparator(object_t &oa, object_t &ob)
     return oa.confidence > ob.confidence;
 }
 
-
 static bool _object_count_comparator(object_t &oa, object_t &ob)
 {
     return oa.x < ob.x;
@@ -83,8 +82,8 @@ std::forward_list<object_t> nms_get_obeject_topn(int8_t *dataset, uint16_t top_n
     for (int i = 0; i < num_record; i++)
     {
         float confidence = float(dataset[i * num_element + OBJECT_C_INDEX] - zero_point) * scale;
-
-        if (int(float(confidence) * 100) >= threshold)
+        confidence = confidence < 1.0 ? (confidence * 100) : confidence;
+        if (int(float(confidence)) >= threshold)
         {
             object_t obj;
             int8_t max = -128;
@@ -97,17 +96,26 @@ std::forward_list<object_t> nms_get_obeject_topn(int8_t *dataset, uint16_t top_n
                     obj.target = j;
                 }
             }
+    
+            float x = float(dataset[i * num_element + OBJECT_X_INDEX] - zero_point) * scale;
+            float y = float(dataset[i * num_element + OBJECT_Y_INDEX] - zero_point) * scale;
+            float w = float(dataset[i * num_element + OBJECT_W_INDEX] - zero_point) * scale;
+            float h = float(dataset[i * num_element + OBJECT_H_INDEX] - zero_point) * scale;
 
-            int x = int(float(float(dataset[i * num_element + OBJECT_X_INDEX] - zero_point) * scale) * width);
-            int y = int(float(float(dataset[i * num_element + OBJECT_Y_INDEX] - zero_point) * scale) * height);
-            int w = int(float(float(dataset[i * num_element + OBJECT_W_INDEX] - zero_point) * scale) * width);
-            int h = int(float(float(dataset[i * num_element + OBJECT_H_INDEX] - zero_point) * scale) * height);
+            if (0.0 < x < 1.0)
+            {
+                obj.x = CLIP(int(x * width), 0, width);
+                obj.y = CLIP(int(y * height), 0, height);
+                obj.w = CLIP(int(w * width), 0, width);
+                obj.h = CLIP(int(h * height), 0, height);
+            }else{
+                obj.x = CLIP(int(x), 0, width);
+                obj.y = CLIP(int(y), 0, height);
+                obj.w = CLIP(int(w), 0, width);
+                obj.h = CLIP(int(h), 0, height);
+            }
 
-            obj.x = CLIP(x, 0, width);
-            obj.y = CLIP(y, 0, height);
-            obj.w = CLIP(w, 0, width);
-            obj.h = CLIP(h, 0, height);
-            obj.confidence = int(float(confidence) * 100);
+            obj.confidence = int(confidence);
             if (num_obj[obj.target] >= top_n)
             {
                 object_count_list[obj.target].sort(_object_count_comparator_reverse);

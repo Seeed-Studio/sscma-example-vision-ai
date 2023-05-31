@@ -76,7 +76,7 @@ extern "C" int tflitemicro_algo_init()
 
     static tflite::MicroErrorReporter micro_error_reporter;
     error_reporter = &micro_error_reporter;
-    uint32_t model_addr = 0x30300000;
+    uint32_t model_addr = 0x30200000;
     // The new version of the model skips the header information
     if ((*(uint32_t *)model_addr & 0xFFFFFF00) == MODEL_MAGIC_NUM)
     {
@@ -93,10 +93,11 @@ extern "C" int tflitemicro_algo_init()
         return -1;
     }
 
-    static tflite::MicroMutableOpResolver<14> micro_op_resolver;
+    static tflite::MicroMutableOpResolver<16> micro_op_resolver;
     micro_op_resolver.AddConv2D();
     micro_op_resolver.AddReshape();
     micro_op_resolver.AddPad();
+    micro_op_resolver.AddPadV2();
     micro_op_resolver.AddAdd();
     micro_op_resolver.AddSub();
     micro_op_resolver.AddRelu();
@@ -106,6 +107,7 @@ extern "C" int tflitemicro_algo_init()
     micro_op_resolver.AddTranspose();
     micro_op_resolver.AddLogistic();
     micro_op_resolver.AddMul();
+    micro_op_resolver.AddSplitV();
     micro_op_resolver.AddStridedSlice();
     micro_op_resolver.AddResizeNearestNeighbor();
 
