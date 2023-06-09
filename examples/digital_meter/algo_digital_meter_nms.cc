@@ -76,13 +76,14 @@ void _hard_nms_obeject_count(std::forward_list<object_t> &object_count_list, uin
 
 std::forward_list<object_t> nms_get_obeject_topn(int8_t *dataset, uint16_t top_n, uint8_t threshold, uint8_t nms, uint16_t width, uint16_t height, int num_record, int8_t num_class, float scale, int zero_point)
 {
+    bool rescale = scale < 0.1 ? true : false;
     std::forward_list<object_t> object_count_list[num_class];
     int16_t num_obj[num_class] = {0};
     int16_t num_element = num_class + OBJECT_T_INDEX;
     for (int i = 0; i < num_record; i++)
     {
         float confidence = float(dataset[i * num_element + OBJECT_C_INDEX] - zero_point) * scale;
-        confidence = confidence < 1.0 ? (confidence * 100) : confidence;
+        confidence = rescale ? confidence * 100 : confidence;
         if (int(float(confidence)) >= threshold)
         {
             object_t obj;
@@ -96,19 +97,21 @@ std::forward_list<object_t> nms_get_obeject_topn(int8_t *dataset, uint16_t top_n
                     obj.target = j;
                 }
             }
-    
+
             float x = float(dataset[i * num_element + OBJECT_X_INDEX] - zero_point) * scale;
             float y = float(dataset[i * num_element + OBJECT_Y_INDEX] - zero_point) * scale;
             float w = float(dataset[i * num_element + OBJECT_W_INDEX] - zero_point) * scale;
             float h = float(dataset[i * num_element + OBJECT_H_INDEX] - zero_point) * scale;
 
-            if (0.0 < x < 1.0)
+            if (rescale)
             {
                 obj.x = CLIP(int(x * width), 0, width);
                 obj.y = CLIP(int(y * height), 0, height);
                 obj.w = CLIP(int(w * width), 0, width);
                 obj.h = CLIP(int(h * height), 0, height);
-            }else{
+            }
+            else
+            {
                 obj.x = CLIP(int(x), 0, width);
                 obj.y = CLIP(int(y), 0, height);
                 obj.w = CLIP(int(w), 0, width);

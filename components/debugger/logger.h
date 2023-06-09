@@ -21,6 +21,7 @@ extern "C"
 {
 #endif
 
+#include <grove_ai_config.h>
 #include <stdint.h>
 #include "hx_drv_timer.h"
 

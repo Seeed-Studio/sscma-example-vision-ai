@@ -62,7 +62,7 @@ namespace
 extern "C" void DebugLog(const char *s) { xprintf("%s", s); } //{ fprintf(stderr, "%s", s); }
 
 #define MODEL_INDEX 1
-#define ALGORITHM_INDEX 4
+#define ALGORITHM_INDEX 0x00
 #define IOU 20
 #define CONFIDENCE 50
 #define IMG_PREVIEW_MAX_SIZE 20
@@ -93,8 +93,9 @@ extern "C" int tflitemicro_algo_init()
         return -1;
     }
 
-    static tflite::MicroMutableOpResolver<16> micro_op_resolver;
+    static tflite::MicroMutableOpResolver<17> micro_op_resolver;
     micro_op_resolver.AddConv2D();
+    micro_op_resolver.AddDepthwiseConv2D();
     micro_op_resolver.AddReshape();
     micro_op_resolver.AddPad();
     micro_op_resolver.AddPadV2();
@@ -145,12 +146,15 @@ extern "C" int tflitemicro_algo_run(uint32_t img, uint32_t ow, uint32_t oh)
     }
 
     // Run inference, and report any error
+    uint32_t start_time = board_get_cur_us();
     TfLiteStatus invoke_status = interpreter->Invoke();
     if (invoke_status != kTfLiteOk)
     {
         TF_LITE_REPORT_ERROR(error_reporter, "Invoke failed.");
         return -1;
     }
+    uint32_t end_time = board_get_cur_us();
+    LOGGER_INFO("Inference time: %d ms\n", (end_time - start_time) / 1000);
 
     // Get the results of the inference attempt
     float scale = ((TfLiteAffineQuantization *)(output->quantization.params))->scale->data[0];
