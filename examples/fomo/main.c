@@ -81,10 +81,7 @@ void main(void)
         if (ercode == 0)
         {
             uint32_t raw_img_addr = datapath_get_yuv_img_addr();
-            uint32_t tick_start = board_get_cur_us();
             tflitemicro_algo_run(raw_img_addr, 240, 240);
-            uint32_t tick_end = board_get_cur_us();
-            LOGGER_INFO("inference time: %d us\r", tick_end - tick_start);
         }
         volatile uint32_t jpeg_addr;
         volatile uint32_t jpeg_size;

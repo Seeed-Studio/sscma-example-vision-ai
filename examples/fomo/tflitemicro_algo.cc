@@ -53,11 +53,19 @@ extern "C" void DebugLog(const char *s) { xprintf("%s", s); } //{ fprintf(stderr
 
 #define MODEL_INDEX 1
 #define ALGORITHM_INDEX 0
-#define CONFIDENCE_THRESHOLD 80
+#define CONFIDENCE_THRESHOLD 50
 #define IMG_PREVIEW_MAX_SIZE 10
 #define IMAGE_PREIVEW_ELEMENT_NUM 6
 #define IMAGE_PREIVEW_ELEMENT_SIZE 4
 #define IMAGE_PREVIEW_FORMATE "{\"type\":\"preview\", \"algorithm\":%d, \"model\":%d, \"count\":%d, \"object\":{\"x\": [%s],\"y\": [%s],\"w\": [%s],\"h\": [%s],\"target\": [%s],\"confidence\": [%s]}}"
+
+/* 区分旧版以及新版模型文件， 旧版模型直接通过tflite转
+ * 新版本模型通过head+tflie, 其中head=MODEL_MAGIC_NUM | INDEX
+ * INDEX定义为1-4为自定义模型，其它为seeed保留模型
+ * 目前 0x11 保留位 人体检测模型
+ */
+#define MODEL_MAGIC_NUM 0x4C485400
+
 
 extern "C" int tflitemicro_algo_init()
 {
@@ -66,10 +74,13 @@ extern "C" int tflitemicro_algo_init()
 
     static tflite::MicroErrorReporter micro_error_reporter;
     error_reporter = &micro_error_reporter;
-    xip_flash_addr = (uint32_t *)0x30000000;
-
-    // get model (.tflite) from flash
-    model = ::tflite::GetModel(xip_flash_addr);
+    uint32_t model_addr = 0x30000000;
+    // The new version of the model skips the header information
+    if ((*(uint32_t *)model_addr & 0xFFFFFF00) == MODEL_MAGIC_NUM)
+    {
+        model_addr += 4;
+    }
+    model = ::tflite::GetModel((void *)model_addr);
     if (model->version() != TFLITE_SCHEMA_VERSION)
     {
         TF_LITE_REPORT_ERROR(error_reporter,
@@ -79,23 +90,13 @@ extern "C" int tflitemicro_algo_init()
         return -1;
     }
 
-    static tflite::MicroMutableOpResolver<16> micro_op_resolver;
+    static tflite::MicroMutableOpResolver<6> micro_op_resolver;
     micro_op_resolver.AddPad();
     micro_op_resolver.AddAdd();
     micro_op_resolver.AddRelu();
-    micro_op_resolver.AddMean();
-    micro_op_resolver.AddPack();
-    micro_op_resolver.AddShape();
     micro_op_resolver.AddConv2D();
-    micro_op_resolver.AddReshape();
     micro_op_resolver.AddSoftmax();
-    micro_op_resolver.AddQuantize();
-    micro_op_resolver.AddMaxPool2D();
-    micro_op_resolver.AddStridedSlice();
-    micro_op_resolver.AddConcatenation();
-    micro_op_resolver.AddAveragePool2D();
     micro_op_resolver.AddDepthwiseConv2D();
-    micro_op_resolver.AddFullyConnected();
 
     // Build an interpreter to run the model with.
     // NOLINTNEXTLINE(runtime-global-variables)
@@ -118,13 +119,20 @@ extern "C" int tflitemicro_algo_init()
 
 extern "C" int tflitemicro_algo_run(uint32_t img, uint32_t ow, uint32_t oh)
 {
-
+    uint32_t dsp_start = 0;
+    uint32_t dsp_end = 0;
+    uint32_t invoke_start = 0;
+    uint32_t invoke_end = 0;
+    uint32_t post_start = 0;
+    uint32_t post_end = 0;
     uint16_t h = input->dims->data[1];
     uint16_t w = input->dims->data[2];
     uint16_t c = input->dims->data[3];
     uint16_t n_h = output->dims->data[1]; // result in row
     uint16_t n_w = output->dims->data[2]; // result in col
     uint16_t n_t = output->dims->data[3]; // result in target
+
+    dsp_start = board_get_cur_us();
 
     yuv422p2rgb(input->data.uint8, (const uint8_t *)img, oh, ow, c, h, w, VISION_ROTATION);
 
@@ -133,14 +141,19 @@ extern "C" int tflitemicro_algo_run(uint32_t img, uint32_t ow, uint32_t oh)
         input->data.int8[i] -= 128;
     }
 
+    dsp_end = board_get_cur_us();
     // Run inference, and report any error
+
+    invoke_start = board_get_cur_us();
     TfLiteStatus invoke_status = interpreter->Invoke();
     if (invoke_status != kTfLiteOk)
     {
         TF_LITE_REPORT_ERROR(error_reporter, "Invoke failed.");
         return -1;
     }
+    invoke_end = board_get_cur_us();
 
+    post_start = board_get_cur_us();
     _fomo_list.clear();
 
     for (int i = 0; i < n_h; i++)
@@ -169,6 +182,9 @@ extern "C" int tflitemicro_algo_run(uint32_t img, uint32_t ow, uint32_t oh)
             }
         }
     }
+    post_end = board_get_cur_us();
+
+    LOGGER_INFO("dsp time: %dms, invoke time: %dms, post time: %dms", (dsp_end - dsp_start)/1000,
 
     return 0;
 }
