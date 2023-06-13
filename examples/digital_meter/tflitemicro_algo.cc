@@ -62,7 +62,7 @@ namespace
 extern "C" void DebugLog(const char *s) { xprintf("%s", s); } //{ fprintf(stderr, "%s", s); }
 
 #define MODEL_INDEX 1
-#define ALGORITHM_INDEX 0x00
+#define ALGORITHM_INDEX 0x04
 #define IOU 20
 #define CONFIDENCE 50
 #define IMG_PREVIEW_MAX_SIZE 20
