@@ -8,4 +8,5 @@ SCENARIO_APP_SUPPORT_LIST +=	$(COMPONENT_ROOT)/configs \
 								$(COMPONENT_ROOT)/drivers/flash \
 								$(COMPONENT_ROOT)/drivers/sensor \
 								$(COMPONENT_ROOT)/drivers/sensor/camera \
+								$(COMPONENT_ROOT)/drivers/sensor/imu \
 					
