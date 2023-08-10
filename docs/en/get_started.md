@@ -78,7 +78,7 @@ python3 tools/ufconv/uf2conv.py -t 0 -c tools/image_gen_cstm/output/output.img -
 - **Step 9:** Convert pre-trained model meter.tflite to **model.uf2** file
 
 ```sh
-python3 tools/ufconv/uf2conv.py -t 1 -c ../model_zone/pfld_meter_int8.tflite -o model.uf2
+python3 tools/ufconv/uf2conv.py -t 1 -c ../model_zoo/pfld_meter_int8.tflite -o model.uf2
 ```
 ## How to flash the firmware?
 
@@ -123,8 +123,8 @@ The performance of the EdgeLab-related models, measured on different chipsets, i
 
 | Target | Model | Dataset | Input Resolution | Peak RAM |Inferencing  Time | F1 Score|Link|
 | ---- | -----| ---| ---| -----------| --------| --------| --------|
-| Grove Vision AI |          Meter         | [custom](https://files.seeedstudio.com/wiki/Edgelab/meter.zip)|112x112 (RGB)| 320KB |     500ms    |  97% |[pfld_meter_int8.tflite](../../model_zone/pfld_meter_int8.tflite)|
-| Grove Vision AI  |          Fomo          | [custom]()|96x96 (GRAY)| 244KB |    150ms    |  99.5%|[fomo_mask_int8.tflite](../../model_zone/fomo_mask_int8.tflite)|
+| Grove Vision AI |          Meter         | [custom](https://files.seeedstudio.com/wiki/Edgelab/meter.zip)|112x112 (RGB)| 320KB |     500ms    |  97% |[pfld_meter_int8.tflite](../../model_zoo/pfld_meter_int8.tflite)|
+| Grove Vision AI  |          Fomo          | [custom]()|96x96 (GRAY)| 244KB |    150ms    |  99.5%|[fomo_mask_int8.tflite](../../model_zoo/fomo_mask_int8.tflite)|
 
 ## Contributing
 - If you find an issue in these examples, or wish to submit an enhancement request, please use the Issues section on Github.

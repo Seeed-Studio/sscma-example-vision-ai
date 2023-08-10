@@ -15,4 +15,4 @@ tools/image_gen_cstm/*.img
 *.tflite
 
 # model zone
-!model_zone/*.*
+!model_zoo/*.*

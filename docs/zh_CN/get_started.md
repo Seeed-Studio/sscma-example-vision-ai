@@ -75,7 +75,7 @@ python3 tools/ufconv/uf2conv.py -t 0 -c tools/image_gen_cstm/output/output.img -
 - **Step 9:** 将 meter.tflite 转换为 **model.uf2** 格式
 
 ```sh
-python3 tools/ufconv/uf2conv.py -t 1 -c ./model_zone/ pfld_meter_int8.tflite -o model.uf2
+python3 tools/ufconv/uf2conv.py -t 1 -c ./model_zoo/ pfld_meter_int8.tflite -o model.uf2
 ```
 ## 如何烧录固件与模型？
 
@@ -115,8 +115,8 @@ Note: 你需要分开两次进入 DFU 模式，一次烧录固件，一次烧录
 
 | Target | Model | Dataset | Input Resolution | Peak RAM |Inferencing Time | F1 Score|Link|
 | ---- | -----| ---| ---| -----------| --------| --------| --------|
-| Grove Vision AI | 仪表 | [自定义](https://files.seeedstudio.com/wiki/Edgelab/meter.zip)|112x112 (RGB)| 320KB | 500ms | 97%|[pfld_meter_int8.tflite](./model_zone/pfld_meter_int8.tflite)|
-| Grove Vision AI | Fomo | [custom]()|96x96 (GRAY)| 244KB | 150ms | 99.5%|[fomo_mask_int8.tflite](./model_zone/fomo_mask_int8.tflite)|
+| Grove Vision AI | 仪表 | [自定义](https://files.seeedstudio.com/wiki/Edgelab/meter.zip)|112x112 (RGB)| 320KB | 500ms | 97%|[pfld_meter_int8.tflite](./model_zoo/pfld_meter_int8.tflite)|
+| Grove Vision AI | Fomo | [custom]()|96x96 (GRAY)| 244KB | 150ms | 99.5%|[fomo_mask_int8.tflite](./model_zoo/fomo_mask_int8.tflite)|
 
 ## 贡献
 
