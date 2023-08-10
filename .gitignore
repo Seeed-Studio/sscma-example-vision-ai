@@ -7,6 +7,7 @@ obj_socket_24/
 #tensorflow/
 #third_party/
 tools/image_gen_cstm/output/
+tools/image_gen_cstm/input/
 tools/image_gen_cstm/*.bin
 tools/image_gen_cstm/*.img
 

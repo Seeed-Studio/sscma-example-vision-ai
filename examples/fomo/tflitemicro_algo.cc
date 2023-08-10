@@ -184,7 +184,7 @@ extern "C" int tflitemicro_algo_run(uint32_t img, uint32_t ow, uint32_t oh)
     }
     post_end = board_get_cur_us();
 
-    LOGGER_INFO("dsp time: %dms, invoke time: %dms, post time: %dms", (dsp_end - dsp_start)/1000,
+    LOGGER_INFO("dsp time: %dms, invoke time: %dms, post time: %dms\n", (dsp_end - dsp_start)/1000, (invoke_end - invoke_start)/1000, (post_end - post_start)/1000);
 
     return 0;
 }
