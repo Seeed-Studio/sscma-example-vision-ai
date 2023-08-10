@@ -38,7 +38,7 @@ namespace
     // signed value.
 
     // An area of memory to use for input, output, and intermediate arrays.
-    constexpr int kTensorArenaSize = 450 * 1024;
+    constexpr int kTensorArenaSize = 600 * 1024;
 #if (defined(__GNUC__) || defined(__GNUG__)) && !defined(__CCAC__)
     static uint8_t tensor_arena[kTensorArenaSize] __attribute__((aligned(16)));
 #else
@@ -78,7 +78,7 @@ extern "C" int tflitemicro_algo_init()
         return -1;
     }
 
-    static tflite::MicroMutableOpResolver<15> micro_op_resolver;
+    static tflite::MicroMutableOpResolver<13> micro_op_resolver;
     micro_op_resolver.AddPad();
     micro_op_resolver.AddAdd();
     micro_op_resolver.AddRelu();
@@ -87,8 +87,6 @@ extern "C" int tflitemicro_algo_init()
     micro_op_resolver.AddShape();
     micro_op_resolver.AddReshape();
     micro_op_resolver.AddConv2D();
-    micro_op_resolver.AddQuantize();
-    micro_op_resolver.AddMaxPool2D();
     micro_op_resolver.AddStridedSlice();
     micro_op_resolver.AddConcatenation();
     micro_op_resolver.AddAveragePool2D();
