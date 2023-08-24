@@ -76,7 +76,7 @@ python3 tools/ufconv/uf2conv.py -t 0 -c tools/image_gen_cstm/output/output.img -
 - **Step 8:** Convert pre-trained model meter.tflite to **model.uf2** file
 
 ```sh
-python3 tools/ufconv/uf2conv.py -t 1 -c ../model_zoo/pfld_meter_int8.tflite -o model.uf2
+python3 tools/ufconv/uf2conv.py -t 1 -c model_zoo/pfld_meter_int8.tflite -o model.uf2
 ```
 ## How to flash the firmware?
 
