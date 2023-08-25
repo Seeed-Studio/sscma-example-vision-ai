@@ -25,9 +25,15 @@ typedef struct {
     int8_t (*set_output_size)(uint16_t width, uint16_t height);
 } Camera_Hal_Struct;
 
-ERROR_T camera_init();
-ERROR_T camera_deinit();
-
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+    ERROR_T camera_init();
+    ERROR_T camera_deinit();
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 

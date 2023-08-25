@@ -25,15 +25,17 @@
 
 #include "el_camera_himax.h"
 
+#include "datapath.h"
+#include "camera_core.h"
+
 namespace edgelab {
 el_err_code_t CameraHimax::init(size_t width, size_t height) {
 
     ERROR_T ret = ERROR_NONE;
-    Sensor_Cfg_t sensor_cfg_t = {
-        .sensor_type = SENSOR_CAMERA,
-        .data.camera_cfg.width = (uint16_t)width,
-        .data.camera_cfg.height = (uint16_t)height,
-    };
+    Sensor_Cfg_t sensor_cfg_t = { 0 };
+    sensor_cfg_t.sensor_type = SENSOR_CAMERA;
+    sensor_cfg_t.data.camera_cfg.width = (uint16_t)width;
+    sensor_cfg_t.data.camera_cfg.height = (uint16_t)height;
 
     ret = datapath_init(sensor_cfg_t.data.camera_cfg.width,
                         sensor_cfg_t.data.camera_cfg.height);
@@ -58,6 +60,8 @@ el_err_code_t CameraHimax::deinit() {
 el_err_code_t CameraHimax::start_stream() {
     datapath_start_work();
 
+    while (!datapath_get_img_state());
+
     this->_is_streaming = true;
     return EL_OK;
 }
@@ -77,11 +81,11 @@ el_err_code_t CameraHimax::get_jpeg(el_img_t* img) {
 
     volatile uint32_t jpeg_addr;
     volatile uint32_t jpeg_size;
-    datapath_get_jpeg_img(&jpeg_addr, &jpeg_size);
+    datapath_get_jpeg_img((uint32_t *)&jpeg_addr, (uint32_t *)&jpeg_size);
 
     img->width  = this->config.data.camera_cfg.width;
     img->height = this->config.data.camera_cfg.height;
-    img->data   = jpeg_addr;
+    img->data   = (uint8_t *)jpeg_addr;
     img->size   = jpeg_size;
     img->format = EL_PIXEL_FORMAT_RGB565;
 

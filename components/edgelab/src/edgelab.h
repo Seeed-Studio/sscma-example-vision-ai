@@ -26,7 +26,6 @@
 #ifndef _EDGELAB_H_
 #define _EDGELAB_H_
 
-#include "el_base64.h"
 #include "el_common.h"
 #include "el_cv.h"
 #include "el_device.h"
@@ -35,10 +34,10 @@
 
 #ifdef __cplusplus
 
-    #include "el_algorithm.hpp"
-    #include "el_data.hpp"
-    #include "el_inference.hpp"
-    #include "el_repl.hpp"
+    //#include "el_algorithm.hpp"
+    //#include "el_data.hpp"
+    //#include "el_inference.hpp"
+    //#include "el_repl.hpp"
 
 using namespace edgelab;
 

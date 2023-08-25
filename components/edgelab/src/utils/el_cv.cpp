@@ -980,7 +980,9 @@ EL_ATTR_WEAK el_err_code_t el_img_convert(const el_img_t* src, el_img_t* dst) {
     } else if (src->format == EL_PIXEL_FORMAT_RGB565 || src->format == EL_PIXEL_FORMAT_RGB888 ||
                src->format == EL_PIXEL_FORMAT_GRAYSCALE) {
         if (dst->format == EL_PIXEL_FORMAT_JPEG) {
+            #ifdef CONFIG_EL_LIB_JPEGENC
             rgb_to_jpeg(src, dst);
+            #endif
         } else {
             rgb_to_rgb(src, dst);
         }

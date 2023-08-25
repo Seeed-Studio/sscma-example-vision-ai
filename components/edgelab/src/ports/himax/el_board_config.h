@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2023 Seeed Technology Co.,Ltd
+ * Copyright (c) 2023 (Seeed Technology Inc.)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,27 +23,7 @@
  *
  */
 
-#ifndef _EL_BASE64_H_
-#define _EL_BASE64_H_
-
-#include "el_common.h"
-
-#ifdef __cplusplus
-extern "C" {
-namespace edgelab {
-#endif
-
-void el_base64_encode_output(const unsigned char* in, int in_len, int (*putc_func)(int));
-
-void el_base64_encode(const unsigned char* in, int in_len, char* out);
-
-// void el_base64_decode_output(const unsigned char* in, int in_len, int (*putc_func)(int));
-
-// void el_base64_decode(const unsigned char* in, int in_len, char* out);
-
-#ifdef __cplusplus
-}
-}
-#endif
+#ifndef _EL_BOARD_CONDIG_H_
+#define _EL_BOARD_CONDIG_H_
 
 #endif
