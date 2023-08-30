@@ -36,6 +36,8 @@
 #include "tensorflow/lite/micro/system_setup.h"
 #include "tensorflow/lite/schema/schema_generated.h"
 
+#define CONFIG_EL_TFLITE
+
 namespace tflite {
 
 enum OpsCount : unsigned int {
