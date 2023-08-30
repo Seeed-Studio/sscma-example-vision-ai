@@ -63,9 +63,9 @@ el_algorithm_type_t el_algorithm_type_from_engine(const edgelab::InferenceEngine
 template <typename T> constexpr std::string el_results_2_json(const std::forward_list<T>& results) {
     auto os{std::ostringstream(std::ios_base::ate)};
     using F                = std::function<void(void)>;
-    static F delim_f       = []() {};
-    static F print_delim_f = [&os]() { os << ", "; };
-    static F print_void_f  = [&]() { delim_f = print_delim_f; };
+    F delim_f       = []() {};
+    F print_delim_f = [&os]() { os << ", "; };
+    F print_void_f  = [&]() { delim_f = print_delim_f; };
     delim_f                = print_void_f;
     if constexpr (std::is_same<T, el_box_t>::value) {
         os << "\"boxes\": [";
