@@ -54,7 +54,7 @@ class MicroInterpreter {
   // the pointed-to objects, ownership remains with the caller.
   MicroInterpreter(const Model* model, const MicroOpResolver& op_resolver,
                    uint8_t* tensor_arena, size_t tensor_arena_size,
-                   ErrorReporter* error_reporter,
+                   ErrorReporter* error_reporter = nullptr,
                    MicroProfiler* profiler = nullptr);
 
   // Create an interpreter instance using an existing MicroAllocator instance.
