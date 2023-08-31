@@ -47,11 +47,12 @@ int main()
     for (;;)
     {
         LOGGER_INFO("Frame: %d\r", frame++);
-        el_img_t img;
+        el_img_t web_img, algo_img;
         camera->start_stream();
-        camera->get_jpeg(&img);
+        camera->get_jpeg(&web_img);
+        camera->get_frame(&algo_img);
 
-        algorithm->run(&img);
+        algorithm->run(&algo_img);
         uint32_t preprocess_time  = algorithm->get_preprocess_time();
         uint32_t run_time         = algorithm->get_run_time();
         uint32_t postprocess_time = algorithm->get_postprocess_time();
@@ -67,11 +68,11 @@ int main()
 
             int16_t y = box.y - box.h / 2;
             int16_t x = box.x - box.w / 2;
-            //el_draw_rect(&img, x, y, box.w, box.h, color[++i % 5], 4);
+            //el_draw_rect(&web_img, x, y, box.w, box.h, color[++i % 5], 4);
         }
         LOGGER_INFO("preprocess: %d, run: %d, postprocess: %d\n", preprocess_time, run_time, postprocess_time);
 
-        hx_drv_webusb_write_vision(img.data, img.size);
+        hx_drv_webusb_write_vision(web_img.data, web_img.size);
     }
     return 0;
 }
