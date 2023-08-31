@@ -87,7 +87,7 @@ el_err_code_t CameraHimax::get_jpeg(el_img_t* img) {
     img->height = this->config.data.camera_cfg.height;
     img->data   = (uint8_t *)jpeg_addr;
     img->size   = jpeg_size;
-    img->format = EL_PIXEL_FORMAT_RGB565;
+    img->format = EL_PIXEL_FORMAT_JPEG;
 
     return EL_OK;
 }
