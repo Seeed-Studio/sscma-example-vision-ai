@@ -38,6 +38,13 @@
 
 #define CONFIG_EL_TFLITE
 
+#define CONFIG_EL_TFLITE_OP_ADD
+#define CONFIG_EL_TFLITE_OP_PAD
+#define CONFIG_EL_TFLITE_OP_RELU
+#define CONFIG_EL_TFLITE_OP_CONV_2D
+#define CONFIG_EL_TFLITE_OP_SOFTMAX
+#define CONFIG_EL_TFLITE_OP_DEPTHWISE_CONV_2D
+
 namespace tflite {
 
 enum OpsCount : unsigned int {
