@@ -32,18 +32,17 @@ namespace edgelab {
 el_err_code_t CameraHimax::init(size_t width, size_t height) {
 
     ERROR_T ret = ERROR_NONE;
-    Sensor_Cfg_t sensor_cfg_t = { 0 };
-    sensor_cfg_t.sensor_type = SENSOR_CAMERA;
-    sensor_cfg_t.data.camera_cfg.width = (uint16_t)width;
-    sensor_cfg_t.data.camera_cfg.height = (uint16_t)height;
+    this->config.sensor_type = SENSOR_CAMERA;
+    this->config.data.camera_cfg.width = (uint16_t)width;
+    this->config.data.camera_cfg.height = (uint16_t)height;
 
-    ret = datapath_init(sensor_cfg_t.data.camera_cfg.width,
-                        sensor_cfg_t.data.camera_cfg.height);
+    ret = datapath_init(this->config.data.camera_cfg.width,
+                        this->config.data.camera_cfg.height);
     if (ret != ERROR_NONE)
     {
         return EL_ELOG;
     }
-    ret = sensor_init(&sensor_cfg_t);
+    ret = sensor_init(&this->config);
     if (ret != ERROR_NONE)
     {
         return EL_ELOG;
