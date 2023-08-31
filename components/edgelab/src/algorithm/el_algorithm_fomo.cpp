@@ -103,7 +103,7 @@ el_err_code_t FOMO::preprocess() {
     auto* i_img{static_cast<ImageType*>(this->__p_input)};
 
     // convert image
-    rgb_to_rgb(i_img, &_input_img);
+    el_img_convert(i_img, &_input_img);
 
     auto size{_input_img.size};
     for (decltype(ImageType::size) i{0}; i < size; ++i) {
