@@ -72,7 +72,22 @@ el_err_code_t CameraHimax::stop_stream() {
     return EL_OK;
 }
 
-el_err_code_t CameraHimax::get_frame(el_img_t* img) { return EL_OK; }
+el_err_code_t CameraHimax::get_frame(el_img_t* img) {
+    if (!this->_is_streaming) {
+        return EL_EIO;
+    }
+
+    volatile uint32_t yuv422_addr;
+    yuv422_addr = datapath_get_yuv_img_addr();
+
+    img->width  = this->config.data.camera_cfg.width;
+    img->height = this->config.data.camera_cfg.height;
+    img->data   = (uint8_t *)yuv422_addr;
+    img->size   = img->width * img->height * 2;
+    img->format = EL_PIXEL_FORMAT_YUV422;
+
+    return EL_OK;
+}
 
 el_err_code_t CameraHimax::get_jpeg(el_img_t* img) {
     if (!this->_is_streaming) {
