@@ -9,7 +9,7 @@
 
 #include "fomo_mobilenetv2_model_data.h"
 
-#define kTensorArenaSize (50 * 1024)
+#define kTensorArenaSize (450 * 1024)
 
 uint8_t malloc_buf[kTensorArenaSize] __attribute__((aligned(16)));
 
