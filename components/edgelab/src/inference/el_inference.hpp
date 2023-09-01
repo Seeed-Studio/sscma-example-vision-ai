@@ -26,6 +26,10 @@
 #ifndef _EL_INFERENCE_HPP_
 #define _EL_INFERENCE_HPP_
 
+#ifndef CONFIG_EL_TFLITE
+    #define CONFIG_EL_TFLITE
+#endif
+
 #ifdef CONFIG_EL_TFLITE
     #include "el_inference_tflite.hpp"
 #endif
