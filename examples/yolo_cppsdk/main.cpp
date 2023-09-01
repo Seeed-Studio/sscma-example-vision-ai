@@ -9,7 +9,7 @@
 
 #include "yolo_model_data.h"
 
-#define kTensorArenaSize (1024 * 1024)
+#define kTensorArenaSize (800 * 1024)
 
 uint8_t malloc_buf[kTensorArenaSize] __attribute__((aligned(16)));
 
