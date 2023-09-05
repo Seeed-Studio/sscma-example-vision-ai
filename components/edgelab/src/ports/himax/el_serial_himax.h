@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2023 (Seeed Technology Inc.)
+ * Copyright (c) 2023 Seeed Technology Co.,Ltd
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,38 +23,35 @@
  *
  */
 
-#include "el_device_himax.h"
+#ifndef _EL_SERIAL_ESP_H_
+#define _EL_SERIAL_ESP_H_
 
-#include "el_camera_himax.h"
-#include "el_serial_himax.h"
+#include "console_io.h"
+#include "hx_drv_uart.h"
 
-//header file from himax sdk
-#include "powermode.h"
+#include "el_serial.h"
 
 namespace edgelab {
 
-DeviceHimax::DeviceHimax() {
-    this->_camera      = static_cast<CameraHimax*>(new CameraHimax());
-    this->_display     = nullptr;
-    this->_serial      = static_cast<SerialEsp*>(new SerialEsp());;
-    this->_device_id   = 0x1234;
-    this->_device_name = "grove vision ai";
-    this->_revision_id = 0x2345;
-}
+class SerialEsp : public Serial {
+   public:
+    SerialEsp();
+    ~SerialEsp() override;
 
-DeviceHimax::~DeviceHimax() {}
+    el_err_code_t init() override;
+    el_err_code_t deinit() override;
 
-Device* Device::get_device() {
-    static DeviceHimax device;
-    return &device;
-}
+    char   echo(bool only_visible = true) override;
+    char   get_char() override;
+    size_t get_line(char* buffer, size_t size, const char delim = 0x0d) override;
 
-void DeviceHimax::restart() {
-#ifdef EXTERNAL_LDO
-    hx_lib_pm_chip_rst(PMU_WE1_POWERPLAN_EXTERNAL_LDO);
-#else
-    hx_lib_pm_chip_rst(PMU_WE1_POWERPLAN_INTERNAL_LDO);
-#endif
-}
+    el_err_code_t read_bytes(char* buffer, size_t size) override;
+    el_err_code_t send_bytes(const char* buffer, size_t size) override;
+
+   private:
+    DEV_UART *console_uart;
+};
 
 }  // namespace edgelab
+
+#endif
