@@ -26,9 +26,9 @@
 #ifndef _EL_REPL_EXECUTOR_HPP_
 #define _EL_REPL_EXECUTOR_HPP_
 
-#include <freertos/FreeRTOS.h>
-#include <freertos/semphr.h>
-#include <freertos/task.h>
+// #include <freertos/FreeRTOS.h>
+// #include <freertos/semphr.h>
+// #include <freertos/task.h>
 
 #include <atomic>
 #include <functional>

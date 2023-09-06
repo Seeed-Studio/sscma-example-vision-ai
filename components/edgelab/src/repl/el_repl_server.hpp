@@ -26,42 +26,49 @@
 #ifndef _EL_REPL_SERVER_HPP_
 #define _EL_REPL_SERVER_HPP_
 
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
+
 #include <algorithm>
 #include <forward_list>
 #include <functional>
+#include <sstream>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "el_compiler.h"
 #include "el_debug.h"
 #include "el_repl_history.hpp"
 #include "el_types.h"
 
-#define CONFIG_EL_REPL_CMD_ARGC_MAX (8)
-
 namespace edgelab::repl {
-    
+
 class ReplServer;
 
 namespace types {
 
-typedef std::function<el_err_code_t(int, char**)> el_repl_cmd_cb_t;
+typedef std::function<void(el_err_code_t, const std::string&)> el_repl_echo_cb_t;
+
+typedef std::function<el_err_code_t(std::vector<std::string>)> el_repl_cmd_cb_t;
 
 struct el_repl_cmd_t {
-    el_repl_cmd_t(std::string cmd, std::string desc, std::string args, el_repl_cmd_cb_t cmd_cb)
-        : _cmd(cmd), _desc(desc), _args(args), _argc(0), _cmd_cb(cmd_cb) {
-        if (args.size()) _argc = std::count(_args.begin(), _args.end(), ',') + 1;
+    el_repl_cmd_t(std::string cmd_, std::string desc_, std::string args_, el_repl_cmd_cb_t cmd_cb_)
+        : cmd(cmd_), desc(desc_), args(args_), cmd_cb(cmd_cb_), _argc(0) {
+        if (args.size()) _argc = std::count(args.begin(), args.end(), ',') + 1;
     }
 
     ~el_repl_cmd_t() = default;
 
+    std::string      cmd;
+    std::string      desc;
+    std::string      args;
+    el_repl_cmd_cb_t cmd_cb;
+
     friend class edgelab::repl::ReplServer;
 
    private:
-    std::string      _cmd;
-    std::string      _desc;
-    std::string      _args;
-    uint8_t          _argc;
-    el_repl_cmd_cb_t _cmd_cb;
+    uint8_t _argc;
 };
 
 }  // namespace types
@@ -74,29 +81,65 @@ class ReplServer {
     ReplServer(ReplServer const&)            = delete;
     ReplServer& operator=(ReplServer const&) = delete;
 
-    void init();
+    void init(types::el_repl_echo_cb_t echo_cb = [](el_err_code_t, const std::string& str) { el_printf(str.c_str()); });
     void deinit();
 
-    void loop(const std::string& line);
-    void loop(const char* line, size_t len);
-    void loop(char c);
+    bool has_cmd(const std::string& cmd);
 
     el_err_code_t register_cmd(const types::el_repl_cmd_t& cmd);
     el_err_code_t register_cmd(const char* cmd, const char* desc, const char* arg, types::el_repl_cmd_cb_t cmd_cb);
 
-    el_err_code_t unregister_cmd(const std::string& cmd);
-    el_err_code_t unregister_cmd(const char* cmd);
+    template <typename... Args> void unregister_cmd(Args&&... args) {
+        const Guard guard(this, _cmd_list_lock);
+        ((m_unregister_cmd(std::forward<Args>(args))), ...);
+    }
 
-    size_t register_cmds(const std::forward_list<types::el_repl_cmd_t>& cmd_list);
-    size_t register_cmds(const types::el_repl_cmd_t* cmd_list, size_t size);
+    std::forward_list<types::el_repl_cmd_t> get_registered_cmds() const;
+    void                                    print_help();
 
-    el_err_code_t print_help();
+    el_err_code_t exec_non_lock(std::string line);
+    el_err_code_t exec(std::string line);
+    void          loop(const std::string& line);
+    void          loop(char c);
 
-   private:
+   protected:
+    struct Guard {
+        Guard(const ReplServer* const repl_server, SemaphoreHandle_t& lock) noexcept
+            : __repl_server(repl_server), __lock(lock) {
+            __repl_server->m_lock(__lock);
+        }
+        ~Guard() noexcept { __repl_server->m_unlock(__lock); }
+
+        Guard(const Guard&)            = delete;
+        Guard& operator=(const Guard&) = delete;
+
+       private:
+        const ReplServer* const __repl_server;
+        SemaphoreHandle_t&      __lock;
+    };
+
+    void m_unregister_cmd(const std::string& cmd);
+
     el_err_code_t m_exec_cmd(const std::string& line);
 
-    ReplHistory                             _history;
+    template <typename... Args> inline void m_echo_cb(el_err_code_t ret, Args&&... args) {
+        auto os{std::ostringstream(std::ios_base::ate)};
+        ((os << (std::forward<Args>(args))), ...);
+        _echo_cb(ret, os.str());
+    }
+
+    inline void m_lock(SemaphoreHandle_t lock) const { xSemaphoreTake(lock, portMAX_DELAY); }
+    inline void m_unlock(SemaphoreHandle_t lock) const { xSemaphoreGive(lock); }
+
+   private:
+    ReplHistory _history;
+
+    mutable SemaphoreHandle_t               _cmd_list_lock;
     std::forward_list<types::el_repl_cmd_t> _cmd_list;
+
+    mutable SemaphoreHandle_t _exec_lock;
+
+    types::el_repl_echo_cb_t _echo_cb;
 
     bool        _is_ctrl;
     std::string _ctrl_line;
