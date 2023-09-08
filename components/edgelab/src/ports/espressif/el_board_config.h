@@ -34,7 +34,19 @@
 
 #include "boards/boards.h"
 
+#define USE_FREERTOS
 
+#ifdef USE_FREERTOS
+#define el_semaphore SemaphoreHandle_t
+#define el_semaphoretake xSemaphoreTake
+#define el_semaphoregive xSemaphoreGive
+#define el_SemaphoreDelete vSemaphoreDelete
 
+#define el_MAX_DELAY portMAX_DELAY
+
+#define el_SemaphoreCreateCounting xSemaphoreCreateCounting
+
+#define el_MAX_TASK_NAME_LEN configMAX_TASK_NAME_LEN 
+#endif
 
 #endif

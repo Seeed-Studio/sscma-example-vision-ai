@@ -25,9 +25,11 @@
 
 #include "el_repl_executor.hpp"
 
+#ifdef USE_FREERTOS
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 #include <freertos/task.h>
+#endif
 
 #include <atomic>
 #include <cstdio>
@@ -41,16 +43,18 @@
 namespace edgelab::repl {
 
 ReplExecutor::ReplExecutor(size_t worker_stack_size, size_t worker_priority)
-    : _task_queue_lock(xSemaphoreCreateCounting(1, 1)),
+    : _task_queue_lock(el_SemaphoreCreateCounting(1, 1)),
       _task_stop_requested(false),
       _worker_thread_stop_requested(false),
+#ifdef USE_FREERTOS
       _worker_ret(),
       _worker_handler(),
-      _worker_name(new char[configMAX_TASK_NAME_LEN]{}),
+#endif
+      _worker_name(new char[el_MAX_TASK_NAME_LEN]{}),
       _worker_stack_size(worker_stack_size),
       _worker_priority(worker_priority) {
     static uint16_t worker_id = 0;
-    volatile size_t length    = configMAX_TASK_NAME_LEN - 1;
+    volatile size_t length    = el_MAX_TASK_NAME_LEN - 1;
     std::snprintf(_worker_name, length, "task_executor_%2X", worker_id++);
 
     EL_ASSERT(_task_stop_requested.is_lock_free());
@@ -59,18 +63,22 @@ ReplExecutor::ReplExecutor(size_t worker_stack_size, size_t worker_priority)
 
 ReplExecutor::~ReplExecutor() {
     stop();
-    vSemaphoreDelete(_task_queue_lock);
+    el_SemaphoreDelete(_task_queue_lock);
 }
 
 void ReplExecutor::start() {
+#ifdef USE_FREERTOS
     _worker_ret =
       xTaskCreate(&ReplExecutor::c_run, _worker_name, _worker_stack_size, this, _worker_priority, &_worker_handler);
+#endif
 }
 
 void ReplExecutor::stop() {
     _worker_thread_stop_requested.store(true, std::memory_order_relaxed);
+#ifdef USE_FREERTOS
     if (_worker_ret == pdPASS) [[likely]]
         vTaskDelete(_worker_handler);
+#endif
 }
 
 void ReplExecutor::add_task(types::el_repl_task_t task) {
@@ -82,8 +90,8 @@ void ReplExecutor::add_task(types::el_repl_task_t task) {
 
 const char* ReplExecutor::get_worker_name() const { return _worker_name; }
 
-inline void ReplExecutor::m_lock() const { xSemaphoreTake(_task_queue_lock, portMAX_DELAY); }
-inline void ReplExecutor::m_unlock() const { xSemaphoreGive(_task_queue_lock); }
+inline void ReplExecutor::m_lock() const { el_semaphoretake(_task_queue_lock, el_MAX_DELAY); }
+inline void ReplExecutor::m_unlock() const { el_semaphoregive(_task_queue_lock); }
 
 void ReplExecutor::run() {
     while (!_worker_thread_stop_requested.load(std::memory_order_relaxed)) {
@@ -101,7 +109,8 @@ void ReplExecutor::run() {
             m_unlock();
         }
         if (task) task(_task_stop_requested);
-        vTaskDelay(15 / portTICK_PERIOD_MS);  // TODO: use yield
+        //vTaskDelay(15 / portTICK_PERIOD_MS);  // TODO: use yield
+        el_sleep(15);
     }
 }
 

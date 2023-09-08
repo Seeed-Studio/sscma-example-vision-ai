@@ -26,13 +26,20 @@
 #ifndef _EL_REPL_EXECUTOR_HPP_
 #define _EL_REPL_EXECUTOR_HPP_
 
-// #include <freertos/FreeRTOS.h>
-// #include <freertos/semphr.h>
-// #include <freertos/task.h>
+#ifdef USE_FREERTOS
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
+#include <freertos/task.h>
+#endif
+
+#include "el_board_config.h"
 
 #include <atomic>
 #include <functional>
 #include <queue>
+
+#define CONFIG_EL_REPL_EXECUTOR_STACK_SIZE 16384
+#define CONFIG_EL_REPL_EXECUTOR_PRIO       5
 
 namespace edgelab::repl {
 
@@ -44,8 +51,8 @@ typedef std::function<void(std::atomic<bool>&)> el_repl_task_t;
 
 class ReplExecutor {
    public:
-    ReplExecutor(size_t worker_stack_size = CONFIG_PTHREAD_TASK_STACK_SIZE_DEFAULT,
-                 size_t worker_priority   = CONFIG_PTHREAD_TASK_PRIO_DEFAULT);
+    ReplExecutor(size_t worker_stack_size = CONFIG_EL_REPL_EXECUTOR_STACK_SIZE,
+                 size_t worker_priority   = CONFIG_EL_REPL_EXECUTOR_PRIO);
     ~ReplExecutor();
 
     void start();
@@ -56,19 +63,20 @@ class ReplExecutor {
     const char* get_worker_name() const;
 
    protected:
-    inline void m_lock();
-    inline void m_unlock();
+    void m_lock() const;
+    void m_unlock() const;
 
     void        run();
     static void c_run(void* this_pointer);
 
    private:
-    SemaphoreHandle_t _task_queue_lock;
-    std::atomic<bool> _task_stop_requested;
-    std::atomic<bool> _worker_thread_stop_requested;
-
+    mutable el_semaphore _task_queue_lock;
+    std::atomic<bool>         _task_stop_requested;
+    std::atomic<bool>         _worker_thread_stop_requested;
+#ifdef USER_FREERTOS
     BaseType_t   _worker_ret;
     TaskHandle_t _worker_handler;
+#endif
     char*        _worker_name;
     size_t       _worker_stack_size;
     size_t       _worker_priority;

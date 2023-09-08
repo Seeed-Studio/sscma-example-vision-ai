@@ -1,7 +1,9 @@
 #include "el_repl_server.hpp"
 
+#ifdef USE_FREERTOS
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
+#endif
 
 #include <algorithm>
 #include <cstring>
@@ -19,8 +21,8 @@
 namespace edgelab::repl {
 
 ReplServer::ReplServer()
-    : _cmd_list_lock(xSemaphoreCreateCounting(1, 1)),
-      _exec_lock(xSemaphoreCreateCounting(1, 1)),
+    : _cmd_list_lock(el_SemaphoreCreateCounting(1, 1)),
+      _exec_lock(el_SemaphoreCreateCounting(1, 1)),
       _is_ctrl(false),
       _line_index(-1) {
     register_cmd("HELP", "List available commands", "", [this](std::vector<std::string>) -> el_err_code_t {

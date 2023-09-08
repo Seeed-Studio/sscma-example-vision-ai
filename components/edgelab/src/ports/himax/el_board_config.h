@@ -26,4 +26,20 @@
 #ifndef _EL_BOARD_CONDIG_H_
 #define _EL_BOARD_CONDIG_H_
 
+#define NON_RTOS
+
+#ifdef NON_RTOS
+    #define el_semaphore uint8_t
+    #define el_semaphoretake(a, b) (0)
+    #define el_semaphoregive(a) (0)
+    #define el_SemaphoreDelete(a) (0)
+
+    #define el_MAX_DELAY 0
+
+    #define el_SemaphoreCreateCounting(a, b) (0)
+
+    #define el_MAX_TASK_NAME_LEN 64
+
+#endif
+
 #endif

@@ -26,8 +26,12 @@
 #ifndef _EL_REPL_SERVER_HPP_
 #define _EL_REPL_SERVER_HPP_
 
+#ifdef USE_FREERTOS
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
+#endif
+
+#include "el_board_config.h"
 
 #include <algorithm>
 #include <forward_list>
@@ -104,7 +108,7 @@ class ReplServer {
 
    protected:
     struct Guard {
-        Guard(const ReplServer* const repl_server, SemaphoreHandle_t& lock) noexcept
+        Guard(const ReplServer* const repl_server, el_semaphore& lock) noexcept
             : __repl_server(repl_server), __lock(lock) {
             __repl_server->m_lock(__lock);
         }
@@ -115,29 +119,32 @@ class ReplServer {
 
        private:
         const ReplServer* const __repl_server;
-        SemaphoreHandle_t&      __lock;
+        el_semaphore&      __lock;
     };
 
     void m_unregister_cmd(const std::string& cmd);
 
     el_err_code_t m_exec_cmd(const std::string& line);
 
-    template <typename... Args> inline void m_echo_cb(el_err_code_t ret, Args&&... args) {
-        auto os{std::ostringstream(std::ios_base::ate)};
-        ((os << (std::forward<Args>(args))), ...);
-        _echo_cb(ret, os.str());
+    template <typename T>
+    void appendToString(std::string& result, const T& arg) {
+        result += (arg);
     }
 
-    inline void m_lock(SemaphoreHandle_t lock) const { xSemaphoreTake(lock, portMAX_DELAY); }
-    inline void m_unlock(SemaphoreHandle_t lock) const { xSemaphoreGive(lock); }
+    template <typename... Args> inline void m_echo_cb(el_err_code_t ret, Args&&... args) {
+        std::string result;
+        ((appendToString(result, std::forward<Args>(args))), ...);
+        _echo_cb(ret, result);
+    }
+
+    inline void m_lock(el_semaphore lock) const { el_semaphoretake(lock, el_MAX_DELAY); }
+    inline void m_unlock(el_semaphore lock) const { el_semaphoregive(lock); }
 
    private:
     ReplHistory _history;
-
-    mutable SemaphoreHandle_t               _cmd_list_lock;
+    mutable el_semaphore               _cmd_list_lock;
     std::forward_list<types::el_repl_cmd_t> _cmd_list;
-
-    mutable SemaphoreHandle_t _exec_lock;
+    mutable el_semaphore _exec_lock;
 
     types::el_repl_echo_cb_t _echo_cb;
 
