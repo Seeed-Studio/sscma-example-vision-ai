@@ -24,10 +24,10 @@
  */
 
 #include "el_data_storage.hpp"
-
+#ifdef USE_FREERTOS
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
-
+#endif
 #include <cstddef>
 
 #include "el_config_internal.h"

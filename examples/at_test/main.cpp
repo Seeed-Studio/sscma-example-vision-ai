@@ -9,11 +9,11 @@ void at_print_help(std::forward_list<el_repl_cmd_t> cmd_list) {
     int length = 0;
 
     for (const auto& cmd : cmd_list) {
-        length += snprintf(buffer + length, sizeof(buffer), "  AT+%s", cmd.cmd.c_str());
+        length += snprintf(buffer + length, sizeof(buffer) - length, "  AT+%s", cmd.cmd.c_str());
         if (cmd.args.size()) {
-            length += snprintf(buffer + length, sizeof(buffer), "=<%s>", cmd.args.c_str());
+            length += snprintf(buffer + length, sizeof(buffer) - length, "=<%s>", cmd.args.c_str());
         }
-        length += snprintf(buffer + length, sizeof(buffer), "\n    %s\n", cmd.desc.c_str());
+        length += snprintf(buffer + length, sizeof(buffer) - length, "\n    %s\n", cmd.desc.c_str());
     }
 
     std::string str(buffer);

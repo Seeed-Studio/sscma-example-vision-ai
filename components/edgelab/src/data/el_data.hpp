@@ -63,8 +63,10 @@ class DataDelegate {
 
 }  // namespace edgelab
 
+#ifdef CONFIG_EL_LIB_FLASHDB
 // TODO: avoid expose this name space globally
 using namespace edgelab::data::types;
 using namespace edgelab::data::utility;
+#endif
 
 #endif

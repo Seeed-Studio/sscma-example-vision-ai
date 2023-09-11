@@ -46,22 +46,22 @@ struct el_algorithm_yolo_config_t {
     static constexpr el_algorithm_info_t info{
       .type = EL_ALGO_TYPE_YOLO, .categroy = EL_ALGO_CAT_DET, .input_from = EL_SENSOR_TYPE_CAM};
     uint8_t score_threshold;
-    uint8_t nms_threshold;
+    uint8_t iou_threshold;
 };
 
 }  // namespace types
 
 class YOLO : public base::Algorithm {
+    public:
     using ImageType        = el_img_t;
     using BoxType          = el_box_t;
     using ConfigType       = types::el_algorithm_yolo_config_t;
     using ScoreType        = decltype(types::el_algorithm_yolo_config_t::score_threshold);
-    using NMSThresholdType = decltype(types::el_algorithm_yolo_config_t::nms_threshold);
+    using NMSThresholdType = decltype(types::el_algorithm_yolo_config_t::iou_threshold);
 
-   public:
     static InfoType algorithm_info;
 
-    YOLO(EngineType* engine, ScoreType score_threshold = 50, NMSThresholdType nms_threshold = 45);
+    YOLO(EngineType* engine, ScoreType score_threshold = 50, NMSThresholdType iou_threshold = 45);
     YOLO(EngineType* engine, const ConfigType& config);
     ~YOLO();
 
@@ -73,8 +73,8 @@ class YOLO : public base::Algorithm {
     void      set_score_threshold(ScoreType threshold);
     ScoreType get_score_threshold() const;
 
-    void             set_nms_threshold(NMSThresholdType threshold);
-    NMSThresholdType get_nms_threshold() const;
+    void             set_iou_threshold(NMSThresholdType threshold);
+    NMSThresholdType get_iou_threshold() const;
 
     void       set_algorithm_config(const ConfigType& config);
     ConfigType get_algorithm_config() const;
@@ -100,7 +100,7 @@ class YOLO : public base::Algorithm {
     float     _h_scale;
 
     std::atomic<ScoreType>        _score_threshold;
-    std::atomic<NMSThresholdType> _nms_threshold;
+    std::atomic<NMSThresholdType> _iou_threshold;
 
     std::forward_list<BoxType> _results;
 };

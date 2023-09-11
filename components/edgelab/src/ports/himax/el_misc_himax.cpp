@@ -71,4 +71,6 @@ EL_ATTR_WEAK void el_free(void* ptr) { free(ptr); }
 
 EL_ATTR_WEAK void el_reset(void) { exit(0); }
 
+EL_ATTR_WEAK void el_status_led(bool on) { EMBARC_PRINTF("TEST LED STAT: %s", on ? "on":"off"); }
+
 }  // namespace edgelab

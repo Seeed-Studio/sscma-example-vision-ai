@@ -1,7 +1,11 @@
 #pragma once
 
-//#include <freertos/FreeRTOS.h>
+#ifdef USE_FREERTOS
+#include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
+#endif
+
+#include "el_board_config.h"
 
 #include <functional>
 #include <string>
@@ -103,10 +107,10 @@ class ActionDelegate {
     }
 
    protected:
-    ActionDelegate() : _node(nullptr), _eval_lock(xSemaphoreCreateCounting(1, 1)){};
+    ActionDelegate() : _node(nullptr), _eval_lock(el_SemaphoreCreateCounting(1, 1)){};
 
-    inline void m_lock() const noexcept { xSemaphoreTake(_eval_lock, portMAX_DELAY); }
-    inline void m_unlock() const noexcept { xSemaphoreGive(_eval_lock); }
+    inline void m_lock() const noexcept { el_semaphoretake(_eval_lock, portMAX_DELAY); }
+    inline void m_unlock() const noexcept { el_semaphoregive(_eval_lock); }
 
     struct Guard {
         Guard(const ActionDelegate* const action) noexcept : __action(action) { __action->m_lock(); }
@@ -122,7 +126,7 @@ class ActionDelegate {
    private:
     intr::ASTNode* _node;
 
-    SemaphoreHandle_t _eval_lock;
+    el_semaphore _eval_lock;
 
     mutable_map_t _mutable_map;
 

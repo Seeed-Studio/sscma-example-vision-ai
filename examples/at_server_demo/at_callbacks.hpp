@@ -15,55 +15,57 @@
 #include "at_definations.hpp"
 #include "at_utility.hpp"
 #include "edgelab.h"
-#include "el_device_esp.h"
 
 void at_server_echo_cb(el_err_code_t ret, const std::string& msg) {
     auto* serial = Device::get_device()->get_serial();
-    auto  os     = std::ostringstream(std::ios_base::ate);
+    char buffer[512] = {0};
 
     if (ret != EL_OK)
-        os << REPLY_LOG_HEADER << "\"name\": \"AT\", \"code\": " << static_cast<int>(ret)
-           << ", \"data\": " << string_2_str(msg) << "}\n";
+        snprintf(buffer, sizeof(buffer), "%s\"name\": \"AT\", \"code\": %d, \"data\": %s}\n", 
+            REPLY_LOG_HEADER, (int)ret, msg.c_str());
 
-    auto str = os.str();
+    std::string str(buffer);
     serial->send_bytes(str.c_str(), str.size());
 }
 
 void at_print_help(std::forward_list<el_repl_cmd_t> cmd_list) {
     auto* serial = Device::get_device()->get_serial();
-    auto  os     = std::ostringstream(std::ios_base::ate);
+    char buffer[4096] = {0};
+    int length = 0;
 
     for (const auto& cmd : cmd_list) {
-        os << "  AT+" << cmd.cmd;
-        if (cmd.args.size()) os << "=<" << cmd.args << ">";
-        os << "\n    " << cmd.desc << "\n";
+        length += snprintf(buffer + length, sizeof(buffer) - length, "  AT+%s", cmd.cmd.c_str());
+        if (cmd.args.size()) {
+            length += snprintf(buffer + length, sizeof(buffer) - length, "=<%s>", cmd.args.c_str());
+        }
+        length += snprintf(buffer + length, sizeof(buffer) - length, "\n    %s\n", cmd.desc.c_str());
     }
 
-    auto str = os.str();
+    std::string str(buffer);
     serial->send_bytes(str.c_str(), str.size());
 }
 
 void at_get_device_id(const std::string& cmd) {
     auto* device = Device::get_device();
     auto* serial = device->get_serial();
-    auto  os     = std::ostringstream(std::ios_base::ate);
+    char buffer[512] = {0};
 
-    os << REPLY_CMD_HEADER << "\"name\": \"" << cmd << "\", \"code\": " << static_cast<int>(EL_OK) << ", \"data\": \""
-       << std::uppercase << std::hex << device->get_device_id() << "\"}\n";
+    snprintf(buffer, sizeof(buffer), "%s\"name\": \"%s\", \"code\": %d, \"data\": \"0x%x\"}\n", 
+        REPLY_CMD_HEADER, cmd.c_str(), static_cast<int>(EL_OK), device->get_device_id());
 
-    auto str = os.str();
+    std::string str(buffer);
     serial->send_bytes(str.c_str(), str.size());
 }
 
 void at_get_device_name(const std::string& cmd) {
     auto* device = Device::get_device();
     auto* serial = device->get_serial();
-    auto  os     = std::ostringstream(std::ios_base::ate);
+    char buffer[512] = {0};
 
-    os << REPLY_CMD_HEADER << "\"name\": \"" << cmd << "\", \"code\": " << static_cast<int>(EL_OK) << ", \"data\": \""
-       << device->get_device_name() << "\"}\n";
+    snprintf(buffer, sizeof(buffer), "%s\"name\": \"%s\", \"code\": %d, \"data\": \"%s\"}\n",
+        REPLY_CMD_HEADER, cmd.c_str(), static_cast<int>(EL_OK), device->get_device_name());
 
-    auto str = os.str();
+    std::string str(buffer);
     serial->send_bytes(str.c_str(), str.size());
 }
 
@@ -74,30 +76,27 @@ void at_get_device_status(const std::string& cmd,
     auto* device = Device::get_device();
     auto* serial = device->get_serial();
     auto* models = DataDelegate::get_delegate()->get_models_handler();
-    auto  os     = std::ostringstream(std::ios_base::ate);
+    char buffer[512] = {0};
 
     auto model_info  = models->get_model_info(current_model_id);
     auto sensor_info = device->get_sensor_info(current_sensor_id);
 
-    os << REPLY_CMD_HEADER << "\"name\": \"" << cmd << "\", \"code\": " << static_cast<int>(EL_OK)
-       << ", \"data\": {\"boot_count\": " << static_cast<unsigned>(boot_count)
-       << ", \"model\": " << model_info_2_json(model_info) << ", \"sensor\": " << sensor_info_2_json(sensor_info)
-       << "}}\n";
+    snprintf(buffer, sizeof(buffer), "%s\"name\": \"%s\", \"code\": , \"data\": {\"boot_count\": %d, \"model\": %s, \"sensor\": %s}}\n",
+        REPLY_CMD_HEADER, cmd.c_str(), static_cast<int>(EL_OK), static_cast<unsigned>(boot_count), model_info_2_json(model_info), sensor_info_2_json(sensor_info));
 
-    auto str = os.str();
+    std::string str(buffer);
     serial->send_bytes(str.c_str(), str.size());
 }
 
 void at_get_version(const std::string& cmd) {
     auto* device = Device::get_device();
     auto* serial = device->get_serial();
-    auto  os     = std::ostringstream(std::ios_base::ate);
+    char buffer[512] = {0};
 
-    os << REPLY_CMD_HEADER << "\"name\": \"" << cmd << "\", \"code\": " << static_cast<int>(EL_OK)
-       << ", \"data\": {\"software\": \"" << EL_VERSION << "\", \"hardware\": \""
-       << static_cast<unsigned>(device->get_chip_revision_id()) << "\"}}\n";
+    snprintf(buffer, sizeof(buffer), "%s\"name\": \"%s\", \"code\": %d, \"data\": {\"software\": \"%s\", \"hardware\": \"%d\"}}\n",
+        REPLY_CMD_HEADER, cmd.c_str(), static_cast<int>(EL_OK), EL_VERSION, static_cast<unsigned>(device->get_chip_revision_id()));
 
-    auto str = os.str();
+    std::string str(buffer);
     serial->send_bytes(str.c_str(), str.size());
 }
 
@@ -105,19 +104,18 @@ void at_get_available_algorithms(const std::string& cmd) {
     auto* serial                = Device::get_device()->get_serial();
     auto* algorithm_delegate    = AlgorithmDelegate::get_delegate();
     auto& registered_algorithms = algorithm_delegate->get_all_algorithm_info();
-    auto  os                    = std::ostringstream(std::ios_base::ate);
+    char buffer[512] = {0};
+    int length = 0;
 
-    os << REPLY_CMD_HEADER << "\"name\": \"" << cmd << "\", \"code\": " << static_cast<int>(EL_OK) << ", \"data\": [";
-    DELIM_RESET;
+    length += snprintf(buffer, sizeof(buffer), "%s\"name\": \"%s\", \"code\": %d, \"data\": [", REPLY_CMD_HEADER, cmd.c_str(), static_cast<int>(EL_OK));
     for (const auto& i : registered_algorithms) {
-        DELIM_PRINT(os);
-        os << "{\"type\": " << static_cast<unsigned>(i->type)
-           << ", \"categroy\": " << static_cast<unsigned>(i->categroy)
-           << ", \"input_from\": " << static_cast<unsigned>(i->input_from) << "}";
+        length += snprintf(buffer+length, sizeof(buffer) - length, "{\"type\": %d", static_cast<unsigned>(i->type));
+        length += snprintf(buffer+length, sizeof(buffer) - length, ", \"categroy\": %d", static_cast<unsigned>(i->categroy));
+        length += snprintf(buffer+length, sizeof(buffer) - length, ", \"input_from\": %d}", static_cast<unsigned>(i->input_from));
     }
-    os << "]}\n";
+    length += snprintf(buffer+length, sizeof(buffer) - length, "]}\n");
 
-    auto str = os.str();
+    std::string str(buffer);
     serial->send_bytes(str.c_str(), str.size());
 }
 
@@ -125,26 +123,28 @@ void at_get_available_models(const std::string& cmd) {
     auto* serial      = Device::get_device()->get_serial();
     auto* models      = DataDelegate::get_delegate()->get_models_handler();
     auto& models_info = models->get_all_model_info();
-    auto  os          = std::ostringstream(std::ios_base::ate);
+    char buffer[512] = {0};
+    int length = 0;
 
-    os << REPLY_CMD_HEADER << "\"name\": \"" << cmd << "\", \"code\": " << static_cast<int>(EL_OK) << ", \"data\": [";
-    DELIM_RESET;
+    length += snprintf(buffer, sizeof(buffer), "%s\"name\": \"%s\", \"code\": %d, \"data\": [",
+        REPLY_CMD_HEADER, cmd.c_str(), static_cast<int>(EL_OK));
     for (const auto& i : models_info) {
-        DELIM_PRINT(os);
-        os << model_info_2_json(i);
+        length += snprintf(buffer + length, sizeof(buffer) - length, "%s", model_info_2_json(i));
     }
-    os << "]}\n";
+    length += snprintf(buffer + length, sizeof(buffer) -length, "]}\n");
 
-    auto str = os.str();
+    std::string str(buffer);
     serial->send_bytes(str.c_str(), str.size());
 }
 
 void at_set_model(const std::string& cmd, uint8_t model_id, InferenceEngine* engine, uint8_t& current_model_id) {
     auto* serial        = Device::get_device()->get_serial();
     auto* data_delegate = DataDelegate::get_delegate();
+#ifdef CONFIG_EL_LIB_FLASHDB
     auto* storage       = data_delegate->get_storage_handler();
+#endif
     auto* models        = data_delegate->get_models_handler();
-    auto  os            = std::ostringstream(std::ios_base::ate);
+    char buffer[512] = {0};
 
     el_model_info_t model_info = models->get_model_info(model_id);
     el_err_code_t   ret        = model_info.id ? EL_OK : EL_EINVAL;
@@ -152,12 +152,12 @@ void at_set_model(const std::string& cmd, uint8_t model_id, InferenceEngine* eng
         goto ModelReply;
 
     // TODO: move heap_caps_malloc to port/el_memory or el_system
-    static auto* tensor_arena = heap_caps_malloc(kTensorArenaSize, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-    memset(tensor_arena, 0, kTensorArenaSize);
+    // static auto* tensor_arena = heap_caps_malloc(kTensorArenaSize, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+    // memset(tensor_arena, 0, kTensorArenaSize);
 
-    ret = engine->init(tensor_arena, kTensorArenaSize);
-    if (ret != EL_OK) [[unlikely]]
-        goto ModelError;
+    // ret = engine->init(tensor_arena, kTensorArenaSize);
+    // if (ret != EL_OK) [[unlikely]]
+    //     goto ModelError;
 
     ret = engine->load_model(model_info.addr_memory, model_info.size);
     if (ret != EL_OK) [[unlikely]]
@@ -165,7 +165,9 @@ void at_set_model(const std::string& cmd, uint8_t model_id, InferenceEngine* eng
 
     if (current_model_id != model_id) {
         current_model_id = model_id;
+#ifdef CONFIG_EL_LIB_FLASHDB
         *storage << el_make_storage_kv("current_model_id", current_model_id);
+#endif
     }
 
     goto ModelReply;
@@ -174,27 +176,27 @@ ModelError:
     current_model_id = 0;
 
 ModelReply:
-    os << REPLY_CMD_HEADER << "\"name\": \"" << cmd << "\", \"code\": " << static_cast<int>(ret)
-       << ", \"data\": {\"model\": " << model_info_2_json(model_info) << "}}\n";
+    snprintf(buffer, sizeof(buffer), "%s\"name\": \"%d\", \"code\": %d, \"data\": {\"model\": %s}}\n", 
+        REPLY_CMD_HEADER, cmd.c_str(), static_cast<int>(ret), model_info_2_json(model_info));
 
-    auto str = os.str();
+    std::string str(buffer);
     serial->send_bytes(str.c_str(), str.size());
 }
 
 void at_get_available_sensors(const std::string& cmd) {
     auto* serial             = Device::get_device()->get_serial();
     auto& registered_sensors = Device::get_device()->get_all_sensor_info();
-    auto  os                 = std::ostringstream(std::ios_base::ate);
+    char buffer[512] = {0};
+    int length = 0;
 
-    os << REPLY_CMD_HEADER << "\"name\": \"" << cmd << "\", \"code\": " << static_cast<int>(EL_OK) << ", \"data\": [";
-    DELIM_RESET;
+    length += snprintf(buffer, sizeof(buffer), "%s\"name\": \"%s\", \"code\": %d, \"data\": [",
+        REPLY_CMD_HEADER, cmd.c_str(), static_cast<int>(EL_OK));
     for (const auto& i : registered_sensors) {
-        DELIM_PRINT(os);
-        os << sensor_info_2_json(i);
+        length += snprintf(buffer + length, sizeof(buffer) - length, "%s", sensor_info_2_json(i));
     }
-    os << "]}\n";
+    length += snprintf(buffer + length, sizeof(buffer) - length, "]}\n");
 
-    auto str = os.str();
+    std::string str(buffer);
     serial->send_bytes(str.c_str(), str.size());
 }
 
@@ -202,8 +204,10 @@ void at_set_sensor(const std::string& cmd, uint8_t sensor_id, bool enable, uint8
     auto* device      = Device::get_device();
     auto* serial      = device->get_serial();
     auto  sensor_info = device->get_sensor_info(sensor_id);
+#ifdef CONFIG_EL_LIB_FLASHDB
     auto* storage     = DataDelegate::get_delegate()->get_storage_handler();
-    auto  os          = std::ostringstream(std::ios_base::ate);
+#endif
+    char buffer[512] = {0};
 
     el_err_code_t ret = sensor_info.id ? EL_OK : EL_EINVAL;
     if (ret != EL_OK) [[unlikely]]
@@ -230,7 +234,9 @@ void at_set_sensor(const std::string& cmd, uint8_t sensor_id, bool enable, uint8
 
         if (current_sensor_id != sensor_id) {
             current_sensor_id = sensor_id;
+#ifdef CONFIG_EL_LIB_FLASHDB
             *storage << el_make_storage_kv("current_sensor_id", current_sensor_id);
+#endif
         }
     } else
         ret = EL_ENOTSUP;
@@ -240,10 +246,10 @@ SensorError:
     current_sensor_id = 0;
 
 SensorReply:
-    os << REPLY_CMD_HEADER << "\"name\": \"" << cmd << "\", \"code\": " << static_cast<int>(ret)
-       << ", \"data\": {\"sensor\": " << sensor_info_2_json(sensor_info) << "}}\n";
+    snprintf(buffer, sizeof(buffer), "%s\"name\": \"%d\", \"code\": %d, \"data\": {\"sensor\": %s}}\n",
+        REPLY_CMD_HEADER, cmd.c_str(), static_cast<int>(ret), sensor_info_2_json(sensor_info));
 
-    auto str = os.str();
+    std::string str(buffer);
     serial->send_bytes(str.c_str(), str.size());
 }
 
@@ -251,23 +257,24 @@ void at_run_sample(const std::string& cmd, int n_times, std::atomic<bool>& stop_
     auto* device      = Device::get_device();
     auto* serial      = device->get_serial();
     auto  sensor_info = device->get_sensor_info(current_sensor_id);
+    char buffer[512] = {0};
 
     el_err_code_t ret = EL_OK;
 
     auto direct_reply = [&]() {
-        auto os = std::ostringstream(std::ios_base::ate);
-        os << REPLY_CMD_HEADER << "\"name\": \"" << cmd << "\", \"code\": " << static_cast<int>(ret)
-           << ", \"data\": {\"sensor\": " << sensor_info_2_json(sensor_info) << "}}\n";
+        memset(buffer, 0x00, sizeof(buffer));
+        snprintf(buffer, sizeof(buffer, "%s\"name\": \"%s\", \"code\": %d, \"data\": {\"sensor\": %s}}\n"), 
+            REPLY_CMD_HEADER, cmd.c_str(), static_cast<int>(ret), sensor_info_2_json(sensor_info));
 
-        auto str = os.str();
+        std::string str(buffer);
         serial->send_bytes(str.c_str(), str.size());
     };
     auto event_reply = [&](const std::string& sample_data_str) {
-        auto os = std::ostringstream(std::ios_base::ate);
-        os << REPLY_EVT_HEADER << "\"name\": \"" << cmd << "\", \"code\": " << static_cast<int>(ret) << ", \"data\": {"
-           << sample_data_str << "}}\n";
+        memset(buffer, 0x00, sizeof(buffer));
+        snprintf(buffer, sizeof(buffer, "%s\"name\": \"%s\", \"code\": %d, \"data\": {%s}}\n"), 
+            REPLY_EVT_HEADER, cmd.c_str(), static_cast<int>(ret), sample_data_str.c_str());
 
-        auto str = os.str();
+        std::string str(buffer);
         serial->send_bytes(str.c_str(), str.size());
     };
 
@@ -413,7 +420,8 @@ void at_run_invoke(const std::string& cmd,
     auto* algorithm_delegate = AlgorithmDelegate::get_delegate();
     auto* data_delegate      = DataDelegate::get_delegate();
     auto* models             = data_delegate->get_models_handler();
-    auto  os                 = std::ostringstream(std::ios_base::ate);
+    char buffer[512] = {0};
+    int length = 0;
 
     el_model_info_t     model_info{};
     el_algorithm_info_t algorithm_info{};
@@ -421,14 +429,19 @@ void at_run_invoke(const std::string& cmd,
 
     el_err_code_t ret = EL_OK;
 
-    auto direct_reply = [&](const std::string& algorithm_config) {
-        os << REPLY_CMD_HEADER << "\"name\": \"" << cmd << "\", \"code\": " << static_cast<int>(ret)
-           << ", \"data\": {\"model\": " << model_info_2_json(model_info)
-           << ", \"algorithm\": {\"type\": " << static_cast<unsigned>(algorithm_info.type)
-           << ", \"category\": " << static_cast<unsigned>(algorithm_info.categroy) << ", \"config\": {"
-           << algorithm_config << "}}, \"sensor\": " << sensor_info_2_json(sensor_info) << "}}\n";
-
-        auto str = os.str();
+    auto direct_reply = [&](const std::string& algorithm_config) {   
+        length += snprintf(buffer, sizeof(buffer), "%s\"name\": \"%s\", \"code\": ", REPLY_CMD_HEADER, 
+            cmd.c_str(), static_cast<int>(ret));
+        length += snprintf(buffer + length, sizeof(buffer) - length, ", \"data\": {\"model\": %s", 
+            model_info_2_json(model_info));
+        length += snprintf(buffer + length, sizeof(buffer) - length, ", \"algorithm\": {\"type\": %d", 
+            static_cast<unsigned>(algorithm_info.type));
+        length += snprintf(buffer + length, sizeof(buffer) - length, ", \"category\": %d, \"config\": {", 
+            static_cast<unsigned>(algorithm_info.categroy));
+        length += snprintf(buffer + length, sizeof(buffer) - length, "%s}}, \"sensor\": %s}}\n", 
+            algorithm_config.c_str(), sensor_info_2_json(sensor_info));
+        
+        std::string str(buffer);
         serial->send_bytes(str.c_str(), str.size());
     };
 
@@ -499,10 +512,12 @@ InvokeErrorReply:
 
 void at_set_action(const std::vector<std::string>& argv) {
     auto* serial          = Device::get_device()->get_serial();
+#ifdef CONFIG_EL_LIB_FLASHDB
     auto* storage         = DataDelegate::get_delegate()->get_storage_handler();
+#endif
     auto* instance        = ReplDelegate::get_delegate()->get_server_handler();
     auto* action_delegate = ActionDelegate::get_delegate();
-    auto  os              = std::ostringstream(std::ios_base::ate);
+    char buffer[512] = {0};
     auto  cmd             = std::string{};
     char  action_cmd[128]{};
 
@@ -515,66 +530,83 @@ void at_set_action(const std::vector<std::string>& argv) {
     action_delegate->set_true_cb([=]() {
         el_err_code_t ret = instance->exec_non_lock(cmd);
 
-        auto os = std::ostringstream(std::ios_base::ate);
-        os << REPLY_EVT_HEADER << "\"name\": \"" << argv[0] << "\", \"code\": " << static_cast<int>(ret)
-           << ", \"data\": {\"true\": " << string_2_str(cmd) << "}}\n";
+        char os_buffer[512] = {0};
+        snprintf(os_buffer, sizeof(os_buffer), "%s\"name\": \"%s\", \"code\": %d, \"data\": {\"true\"%s}}\n", 
+            REPLY_EVT_HEADER, argv[0].c_str(), static_cast<int>(ret), string_2_str(cmd).c_str());
 
-        auto str = os.str();
-        serial->send_bytes(str.c_str(), str.size());
+        serial->send_bytes(os_buffer, strlen(os_buffer));
     });
     cmd = argv[3];
     cmd.insert(0, "AT+");
     action_delegate->set_false_exception_cb([=]() { instance->exec_non_lock(cmd); });
 
     {
-        auto builder = std::ostringstream(std::ios_base::ate);
-        builder << "AT+" << argv[0] << '=' << string_2_str(argv[1]) << ',' << string_2_str(argv[2]) << ','
-                << string_2_str(argv[3]);
-        cmd = builder.str();
+        char builder[512] = {0};
+        snprintf(builder, sizeof(builder), "AT+%s=%s,%s,%s", 
+            string_2_str(argv[1]).c_str(), string_2_str(argv[2]).c_str(), string_2_str(argv[3]).c_str());
+        
+        std::string str(builder);
+        cmd = str;
         std::strncpy(action_cmd, cmd.c_str(), sizeof(action_cmd) - 1);
+#ifdef CONFIG_EL_LIB_FLASHDB
         auto kv = el_make_storage_kv("action_cmd", action_cmd);
         *storage << kv;
+#endif
     }
 
 ActionReply:
-    os << REPLY_CMD_HEADER << "\"name\": \"" << argv[0] << "\", \"code\": " << static_cast<int>(ret)
-       << ", \"data\": {\"cond\": " << string_2_str(argv[1]) << ", \"true\": " << string_2_str(argv[2])
-       << ", \"false_or_exception\": " << string_2_str(argv[3]) << "}}\n";
+    snprintf(buffer, sizeof(buffer), "%s\"name\": \"%s\", \"code\": %d, \"data\": {\"cond\": %s, \
+        \"true\": %s, \"false_or_exception\": %s}}\n", 
+        REPLY_CMD_HEADER, argv[0].c_str(), static_cast<int>(ret), string_2_str(argv[1]).c_str(), 
+        string_2_str(argv[2]).c_str(), string_2_str(argv[3]).c_str());
 
-    auto str = os.str();
-    serial->send_bytes(str.c_str(), str.size());
+    serial->send_bytes(buffer, strlen(buffer));
 }
 
 void at_unset_action(const std::string& cmd) {
     auto* serial          = Device::get_device()->get_serial();
+#ifdef CONFIG_EL_LIB_FLASHDB
     auto* storage         = DataDelegate::get_delegate()->get_storage_handler();
+#endif
     auto* action_delegate = ActionDelegate::get_delegate();
-    auto  os              = std::ostringstream(std::ios_base::ate);
+    char buffer[512] = {0};
 
     action_delegate->unset_condition();
+#ifdef CONFIG_EL_LIB_FLASHDB
     storage->erase("action_cmd");
+#endif
 
-    os << REPLY_CMD_HEADER << "\"name\": \"" << cmd << "\", \"code\": " << static_cast<int>(EL_OK)
-       << ", \"data\": {}}\n";
+    snprintf(buffer, sizeof(buffer), "%s\"name\": \"%s\", \"code\": %d, \"data\": {}}\n", 
+        REPLY_CMD_HEADER, cmd.c_str(), static_cast<int>(EL_OK));
 
-    auto str = os.str();
+    std::string str(buffer);
     serial->send_bytes(str.c_str(), str.size());
 }
 
 void at_get_action(const std::string& cmd) {
     auto* serial          = Device::get_device()->get_serial();
+#ifdef CONFIG_EL_LIB_FLASHDB
     auto* storage         = DataDelegate::get_delegate()->get_storage_handler();
+#endif
     auto* action_delegate = ActionDelegate::get_delegate();
-    auto  os              = std::ostringstream(std::ios_base::ate);
+    char buffer[512] = {0};
     char  action_cmd[128]{};
 
-    if (action_delegate->has_condition() && storage->contains("action_cmd"))
+    if (action_delegate->has_condition() 
+#ifdef CONFIG_EL_LIB_FLASHDB
+    && storage->contains("action_cmd")
+#endif
+    ) {
+#ifdef CONFIG_EL_LIB_FLASHDB
         *storage >> el_make_storage_kv("action_cmd", action_cmd);
+#endif
+    }
 
     std::string action_cmd_str = action_cmd;
-    os << REPLY_CMD_HEADER << "\"name\": \"" << cmd << "\", \"code\": " << static_cast<int>(EL_OK)
-       << ", \"data\": " << string_2_str(action_cmd) << "}\n";
+    snprintf(buffer, sizeof(buffer), "%s\"name\": \"%s\", \"code\": %d, \"data\": %s}\n", 
+        REPLY_CMD_HEADER, cmd.c_str(), static_cast<int>(EL_OK), string_2_str(action_cmd).c_str());
 
-    auto str = os.str();
+    std::string str(buffer);
     serial->send_bytes(str.c_str(), str.size());
 }
+

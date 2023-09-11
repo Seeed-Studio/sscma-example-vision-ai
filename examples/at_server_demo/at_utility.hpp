@@ -10,10 +10,10 @@
 
 #include "at_definations.hpp"
 #include "el_algorithm.hpp"
-#include "el_base64.h"
+//#include "el_base64.h"
 #include "el_cv.h"
 #include "el_data.hpp"
-#include "el_device_esp.h"
+#include "el_device.h"
 #include "el_repl.hpp"
 #include "el_types.h"
 
@@ -153,64 +153,73 @@ void draw_results_on_image(const std::forward_list<el_box_t>& results, el_img_t*
 }
 
 std::string model_info_2_json(el_model_info_t model_info) {
-    auto os{std::ostringstream(std::ios_base::ate)};
-    os << "{\"id\": " << static_cast<unsigned>(model_info.id)
-       << ", \"type\": " << static_cast<unsigned>(model_info.type) << ", \"address\": \"0x" << std::hex
-       << static_cast<unsigned>(model_info.addr_flash) << "\", \"size\": \"0x" << static_cast<unsigned>(model_info.size)
-       << "\"}";
-    return os.str();
+    char buffer[512] = {0};
+    snprintf(buffer, sizeof(buffer), "{\"id\": %d, \"type\": %d, \"address\": \"0x%x\", \"size\": \"0x%x\"}", 
+        static_cast<unsigned>(model_info.id), static_cast<unsigned>(model_info.type), static_cast<unsigned>(model_info.addr_flash), static_cast<unsigned>(model_info.size));
+    
+    std::string str(buffer);
+    return str;
 }
 
 std::string sensor_info_2_json(el_sensor_info_t sensor_info) {
-    auto os{std::ostringstream(std::ios_base::ate)};
-    os << "{\"id\": " << static_cast<unsigned>(sensor_info.id)
-       << ", \"type\": " << static_cast<unsigned>(sensor_info.type)
-       << ", \"state\": " << static_cast<unsigned>(sensor_info.state) << "}";
-    return os.str();
+    char buffer[512] = {0};
+
+    snprintf(buffer, sizeof(buffer), "{\"id\": %d, \"type\": %d, \"state\": %d}", 
+        static_cast<unsigned>(sensor_info.id), static_cast<unsigned>(sensor_info.type), static_cast<unsigned>(sensor_info.state));
+    
+    std::string str(buffer);
+    return str;
 }
 
 template <typename T> constexpr std::string results_2_json(const std::forward_list<T>& results) {
-    auto os{std::ostringstream(std::ios_base::ate)};
+    char buffer[512] = {0};
+    int length = 0;
     using F                = std::function<void(void)>;
-    static F delim_f       = []() {};
-    static F print_delim_f = [&os]() { os << ", "; };
-    static F print_void_f  = [&]() { delim_f = print_delim_f; };
+    F delim_f       = []() {};
+    F print_delim_f = [&buffer,&length]() { length += snprintf(buffer, sizeof(buffer), ", "); };
+    F print_void_f  = [&]() { delim_f = print_delim_f; };
     delim_f                = print_void_f;
     if constexpr (std::is_same<T, el_box_t>::value) {
-        os << "\"boxes\": [";
+        length += snprintf(buffer + length, sizeof(buffer) - length, "\"boxes\": [");
         for (const auto& box : results) {
             delim_f();
-            os << "[" << static_cast<unsigned>(box.x) << ", " << static_cast<unsigned>(box.y) << ", "
-               << static_cast<unsigned>(box.w) << ", " << static_cast<unsigned>(box.h) << ", "
-               << static_cast<unsigned>(box.target) << ", " << static_cast<unsigned>(box.score) << "]";
+            length += snprintf(buffer + length, sizeof(buffer) - length, "[%d, %d, %d, %d, %d, %d]", 
+                static_cast<unsigned>(box.x), static_cast<unsigned>(box.y),
+                static_cast<unsigned>(box.w), static_cast<unsigned>(box.h),
+                static_cast<unsigned>(box.target), static_cast<unsigned>(box.score));
         }
     } else if constexpr (std::is_same<T, el_point_t>::value) {
-        os << "\"points\": [";
+        length += snprintf(buffer + length, sizeof(buffer) - length, "\"points\": [");
         for (const auto& point : results) {
             delim_f();
-            os << "[" << static_cast<unsigned>(point.x) << ", " << static_cast<unsigned>(point.y) << ", "
-               << static_cast<unsigned>(point.target) << "]";
+            length += snprintf(buffer + length, sizeof(buffer) - length, "[%d, %d, %d]", 
+                static_cast<unsigned>(point.x), static_cast<unsigned>(point.y), 
+                static_cast<unsigned>(point.target));
         }
     } else if constexpr (std::is_same<T, el_class_t>::value) {
-        os << "\"classes\": [";
+        length += snprintf(buffer + length, sizeof(buffer) - length, "\"classes\": [");
         for (const auto& cls : results) {
             delim_f();
-            os << "[" << static_cast<unsigned>(cls.score) << ", " << static_cast<unsigned>(cls.target) << "]";
+            length += snprintf(buffer + length, sizeof(buffer) - length, "[%d, %d]", 
+                static_cast<unsigned>(cls.score), static_cast<unsigned>(cls.target));
         }
     }
-    os << "]";
-    return os.str();
+    snprintf(buffer + length, sizeof(buffer) - length, "]");
+    std::string str(buffer);
+
+    return str;
 }
 
 // TODO: avoid repeatly allocate/release memory in for loop
 std::string img_2_json_str(const el_img_t* img) {
     using namespace edgelab;
-    auto os = std::ostringstream(std::ios_base::ate);
+    char buffer[512] = {0};
+    int length = 0;
 
     if (!img || !img->data) [[unlikely]]
         return {};
 
-    os << "\"jpeg\": \"";
+    length += snprintf(buffer, sizeof(buffer), "\"jpeg\": \"");
     size_t size     = img->width * img->height * 3;
     auto   jpeg_img = el_img_t{.data   = new uint8_t[size]{},
                                .size   = size,
@@ -219,17 +228,22 @@ std::string img_2_json_str(const el_img_t* img) {
                                .format = EL_PIXEL_FORMAT_JPEG,
                                .rotate = img->rotate};
 
-    el_err_code_t ret = rgb_to_jpeg(img, &jpeg_img);
+    el_err_code_t ret = EL_OK;
+#ifdef CONFIG_EL_LIB_JPEGENC
+    ret = rgb_to_jpeg(img, &jpeg_img);
+#endif
     if (ret == EL_OK) [[likely]] {
         auto* buffer = new char[((jpeg_img.size + 2) / 3) * 4 + 1]{};
-        el_base64_encode(jpeg_img.data, jpeg_img.size, buffer);
-        os << buffer;
+        //TODO: need fix
+        //el_base64_encode(jpeg_img.data, jpeg_img.size, buffer);
+        length += snprintf(buffer + length, sizeof(buffer) - length, "%s", buffer);
         delete[] buffer;
     }
     delete[] jpeg_img.data;
-    os << "\"";
+    length += snprintf(buffer + length, sizeof(buffer) - length, "\"");
+    std::string str(buffer);
 
-    return std::string(os.str());
+    return str;
 }
 
 std::string simple_reply_ok(const std::string& cmd) {
@@ -242,32 +256,45 @@ std::string simple_reply_ok(const std::string& cmd) {
 
 template <typename ConfigType> std::string algorithm_config_2_json_str(const ConfigType& config) {
     using namespace edgelab;
-    auto os = std::ostringstream(std::ios_base::ate);
+    char buffer[512] = {0};
+    int length = 0;
 
     if constexpr (std::is_same<ConfigType, el_algorithm_fomo_config_t>::value ||
                   std::is_same<ConfigType, el_algorithm_imcls_config_t>::value)
-        os << "\"score_threshold\": " << static_cast<unsigned>(config.score_threshold);
-    else if constexpr (std::is_same<ConfigType, el_algorithm_yolo_config_t>::value)
-        os << "\"score_threshold\": " << static_cast<unsigned>(config.score_threshold)
-           << ", \"iou_threshold\": " << static_cast<unsigned>(config.iou_threshold);
+        length += snprintf(buffer, sizeof(buffer), "\"score_threshold\": %d", 
+            static_cast<unsigned>(config.score_threshold));
+    else if constexpr (std::is_same<ConfigType, el_algorithm_yolo_config_t>::value) {
+        length += snprintf(buffer + length, sizeof(buffer) - length, "\"score_threshold\": %d", 
+            static_cast<unsigned>(config.score_threshold));
+        length += snprintf(buffer + length, sizeof(buffer) - length, ", \"iou_threshold\": ", 
+            static_cast<unsigned>(config.iou_threshold));
+    }
 
-    return os.str();
+    std::string str(buffer);
+    return str;
 }
 
 template <typename AlgorithmType>
 std::string img_invoke_results_2_json_str(
   const AlgorithmType* algorithm, const el_img_t* img, const std::string& cmd, bool result_only, el_err_code_t ret) {
     using namespace edgelab;
-    auto os = std::ostringstream(std::ios_base::ate);
+    char buffer[512] = {0};
+    int length = 0;
 
-    os << REPLY_EVT_HEADER << "\"name\": \"" << cmd << "\", \"code\": " << static_cast<int>(ret)
-       << ", \"data\": {\"perf\": [" << static_cast<unsigned>(algorithm->get_preprocess_time()) << ", "
-       << static_cast<unsigned>(algorithm->get_run_time()) << ", "
-       << static_cast<unsigned>(algorithm->get_postprocess_time()) << "], " << results_2_json(algorithm->get_results());
-    if (!result_only) os << ", " << img_2_json_str(img);
-    os << "}}\n";
+    length += snprintf(buffer, sizeof(buffer), "%s\"name\": \"%s\", \"code\": %d", 
+        REPLY_EVT_HEADER, cmd.c_str(), static_cast<int>(ret));
+    length += snprintf(buffer + length, sizeof(buffer) - length, ", \"data\": {\"perf\": [%d,%d,%d], %s", 
+        static_cast<unsigned>(algorithm->get_preprocess_time()),
+        static_cast<unsigned>(algorithm->get_run_time()), 
+        static_cast<unsigned>(algorithm->get_postprocess_time()),
+        results_2_json(algorithm->get_results()));
+    if (!result_only)
+        length += snprintf(buffer + length, sizeof(buffer) - length, ", %s", 
+            img_2_json_str(img).c_str());
+    length += snprintf(buffer + length, sizeof(buffer) - length, "}}\n");
 
-    return std::string(os.str());
+    std::string str(buffer);
+    return str;
 }
 
 template <typename AlgorithmType> class AlgorithmConfigHelper {
@@ -278,50 +305,61 @@ template <typename AlgorithmType> class AlgorithmConfigHelper {
         : _instance(edgelab::ReplDelegate::get_delegate()->get_server_handler()),
           _algorithm(algorithm),
           _config(algorithm->get_algorithm_config()),
+#ifdef CONFIG_EL_LIB_FLASHDB
           _kv(el_make_storage_kv_from_type(_config)),
-          _storage(edgelab::DataDelegate::get_delegate()->get_storage_handler()),
-          _serial(edgelab::Device::get_device()->get_serial()) {
+          //_storage(edgelab::DataDelegate::get_delegate()->get_storage_handler()),
+#endif
+          _serial(edgelab::Device::get_device()->get_serial()) 
+          {
         using namespace edgelab;
-
+        
+#ifdef CONFIG_EL_LIB_FLASHDB
         if (_storage->contains(_kv.key)) [[likely]]
             *_storage >> _kv;
         else
             *_storage << _kv;
         _algorithm->set_algorithm_config(_kv.value);
-
+#endif
         if constexpr (std::is_same<ConfigType, el_algorithm_fomo_config_t>::value ||
                       std::is_same<ConfigType, el_algorithm_imcls_config_t>::value ||
                       std::is_same<ConfigType, el_algorithm_yolo_config_t>::value) {
             el_err_code_t ret = _instance->register_cmd(
               "TSCORE", "Set score threshold", "SCORE_THRESHOLD", [this](std::vector<std::string> argv) {
-                  auto          os    = std::ostringstream(std::ios_base::ate);
+                  char buffer[512] = {0};
                   uint8_t       value = std::atoi(argv[1].c_str());
                   el_err_code_t ret   = value <= 100 ? EL_OK : EL_EINVAL;
 
                   if (ret == EL_OK) {
                       this->_algorithm->set_score_threshold(value);
+#ifdef CONFIG_EL_LIB_FLASHDB
                       this->_kv.value.score_threshold = value;
                       *(this->_storage) << this->_kv;
+#endif
                   }
+                  memset(buffer, 0x00, sizeof(buffer));
+                  snprintf(buffer, sizeof(buffer), "%s\"name\": \"%s\", \"code\": %d, \"data\": \"%d\"}\n", 
+                    REPLY_CMD_HEADER, argv[0].c_str(), static_cast<int>(ret), 
+#ifdef CONFIG_EL_LIB_FLASHDB
+                    static_cast<unsigned>(this->_kv.value.score_threshold)
+#else
+                    EL_OK
+#endif
+                    );
 
-                  os << REPLY_CMD_HEADER << "\"name\": \"" << argv[0] << "\", \"code\": " << static_cast<int>(ret)
-                     << ", \"data\": \"" << static_cast<unsigned>(this->_kv.value.score_threshold) << "\"}\n";
-
-                  auto str = os.str();
-                  this->_serial->send_bytes(str.c_str(), str.size());
+                  this->_serial->send_bytes(buffer, strlen(buffer));
 
                   return EL_OK;
               });
             if (ret == EL_OK) _config_cmds.emplace_front("TSCORE");
 
             ret = _instance->register_cmd("TSCORE?", "Get score threshold", "", [this](std::vector<std::string> argv) {
-                auto os = std::ostringstream(std::ios_base::ate);
+                char buffer[512] = {0};
 
-                os << REPLY_CMD_HEADER << "\"name\": \"" << argv[0] << "\", \"code\": " << static_cast<int>(EL_OK)
-                   << ", \"data\": \"" << static_cast<unsigned>(this->_algorithm->get_score_threshold()) << "\"}\n";
+                snprintf(buffer, sizeof(buffer), "%s\"name\": \"%s\", \"code\": %d, \"data\": \"%d\"}\n", 
+                    REPLY_CMD_HEADER, argv[0].c_str(), static_cast<int>(EL_OK), 
+                    static_cast<unsigned>(this->_algorithm->get_score_threshold()));
 
-                auto str = os.str();
-                this->_serial->send_bytes(str.c_str(), str.size());
+                this->_serial->send_bytes(buffer, strlen(buffer));
 
                 return EL_OK;
             });
@@ -330,34 +368,41 @@ template <typename AlgorithmType> class AlgorithmConfigHelper {
         if constexpr (std::is_same<ConfigType, el_algorithm_yolo_config_t>::value) {
             el_err_code_t ret = _instance->register_cmd(
               "TIOU", "Set IoU threshold", "IOU_THRESHOLD", [this](std::vector<std::string> argv) {
-                  auto          os    = std::ostringstream(std::ios_base::ate);
+                  char buffer[512] = {0};
                   uint8_t       value = std::atoi(argv[1].c_str());
                   el_err_code_t ret   = value <= 100 ? EL_OK : EL_EINVAL;
 
                   if (ret == EL_OK) {
                       this->_algorithm->set_iou_threshold(value);
+#ifdef CONFIG_EL_LIB_FLASHDB
                       this->_kv.value.iou_threshold = value;
                       *(this->_storage) << this->_kv;
+#endif
                   }
 
-                  os << REPLY_CMD_HEADER << "\"name\": \"" << argv[0] << "\", \"code\": " << static_cast<int>(ret)
-                     << ", \"data\": \"" << static_cast<unsigned>(this->_kv.value.iou_threshold) << "\"}\n";
+                  snprintf(buffer, sizeof(buffer), "%s\"name\": \"%s\", \"code\": %d, \"data\": \"%d\"}\n", 
+                    REPLY_CMD_HEADER, argv[0].c_str(), static_cast<int>(ret),
+#ifdef CONFIG_EL_LIB_FLASHDB
+                    static_cast<unsigned>(this->_kv.value.iou_threshold)
+#else
+                    EL_OK
+#endif
+                    );
 
-                  auto str = os.str();
-                  this->_serial->send_bytes(str.c_str(), str.size());
+                  this->_serial->send_bytes(buffer, strlen(buffer));
 
                   return EL_OK;
               });
             if (ret == EL_OK) _config_cmds.emplace_front("TIOU");
 
             ret = _instance->register_cmd("TIOU?", "Get IoU threshold", "", [this](std::vector<std::string> argv) {
-                auto os = std::ostringstream(std::ios_base::ate);
+                char buffer[512] = {0};
 
-                os << REPLY_CMD_HEADER << "\"name\": \"" << argv[0] << "\", \"code\": " << static_cast<int>(EL_OK)
-                   << ", \"data\": \"" << static_cast<unsigned>(this->_algorithm->get_iou_threshold()) << "\"}\n";
+                snprintf(buffer, sizeof(buffer), "%s\"name\": \"%s\", \"code\": %d, \"data\": \"%d\"}\n", 
+                    REPLY_CMD_HEADER, argv[0].c_str(), static_cast<int>(EL_OK), 
+                    static_cast<unsigned>(this->_algorithm->get_iou_threshold()));
 
-                auto str = os.str();
-                this->_serial->send_bytes(str.c_str(), str.size());
+                this->_serial->send_bytes(buffer, strlen(buffer));
 
                 return EL_OK;
             });
@@ -377,9 +422,11 @@ template <typename AlgorithmType> class AlgorithmConfigHelper {
 
     AlgorithmType*                                     _algorithm;
     ConfigType                                         _config;
+#ifdef CONFIG_EL_LIB_FLASHDB
     edgelab::data::types::el_storage_kv_t<ConfigType&> _kv;
 
     edgelab::data::Storage* _storage;
+#endif
     edgelab::Serial*        _serial;
 };
 

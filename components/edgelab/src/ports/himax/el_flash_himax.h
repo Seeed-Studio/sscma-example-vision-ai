@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2023 Seeed Technology Co.,Ltd
+ * Copyright (c) 2023 (Seeed Technology Inc.)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,16 +23,27 @@
  *
  */
 
-#ifndef _EL_FLASH_H_
-#define _EL_FLASH_H_
+#ifndef _EL_FLASH_HIMAX_H_
+#define _EL_FLASH_HIMAX_H_
 
 #include "el_types.h"
 
-#ifdef CONFIG_EL_TARGET_ESPPRESSIF
-    #include "el_flash_esp.h"
-#else
-    #include "el_flash_himax.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef int8_t el_model_mmap_handler_t;
+
+el_err_code_t el_model_partition_mmap_init(const char*              partition_name,
+                                           uint32_t*                partition_start_addr,
+                                           uint32_t*                partition_size,
+                                           const uint8_t**          flash_2_memory_map,
+                                           el_model_mmap_handler_t* mmap_handler);
+
+void el_model_partition_mmap_deinit(el_model_mmap_handler_t* mmap_handler);
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif
-

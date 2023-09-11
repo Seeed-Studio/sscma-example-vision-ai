@@ -29,12 +29,12 @@ namespace edgelab::algorithm {
 
 YOLO::InfoType YOLO::algorithm_info{types::el_algorithm_yolo_config_t::info};
 
-YOLO::YOLO(EngineType* engine, ScoreType score_threshold, NMSThresholdType nms_threshold)
+YOLO::YOLO(EngineType* engine, ScoreType score_threshold, NMSThresholdType iou_threshold)
     : edgelab::algorithm::base::Algorithm(engine, YOLO::algorithm_info),
       _w_scale(1.f),
       _h_scale(1.f),
       _score_threshold(score_threshold),
-      _nms_threshold(nms_threshold) {
+      _iou_threshold(iou_threshold) {
     init();
 }
 
@@ -43,7 +43,7 @@ YOLO::YOLO(EngineType* engine, const ConfigType& config)
       _w_scale(1.f),
       _h_scale(1.f),
       _score_threshold(config.score_threshold),
-      _nms_threshold(config.nms_threshold) {
+      _iou_threshold(config.iou_threshold) {
     init();
 }
 
@@ -85,7 +85,7 @@ bool YOLO::is_model_valid(const EngineType* engine) {
 inline void YOLO::init() {
     EL_ASSERT(is_model_valid(this->__p_engine));
     EL_ASSERT(_score_threshold.is_lock_free());
-    EL_ASSERT(_nms_threshold.is_lock_free());
+    EL_ASSERT(_iou_threshold.is_lock_free());
 
     _input_img.data   = static_cast<decltype(ImageType::data)>(this->__p_engine->get_input(0));
     _input_img.width  = static_cast<decltype(ImageType::width)>(this->__input_shape.dims[1]),
@@ -145,7 +145,7 @@ el_err_code_t YOLO::postprocess() {
     auto num_class{static_cast<uint8_t>(num_element - 5)};
 
     ScoreType        score_threshold{get_score_threshold()};
-    NMSThresholdType nms_threshold{get_nms_threshold()};
+    NMSThresholdType iou_threshold{get_iou_threshold()};
 
     // parse output
     for (decltype(num_record) i{0}; i < num_record; ++i) {
@@ -185,7 +185,7 @@ el_err_code_t YOLO::postprocess() {
             _results.emplace_front(std::move(box));
         }
     }
-    el_nms(_results, nms_threshold, score_threshold, false, true);
+    el_nms(_results, iou_threshold, score_threshold, false, true);
 
     _results.sort([](const BoxType& a, const BoxType& b) { return a.x < b.x; });
 
@@ -198,17 +198,17 @@ void YOLO::set_score_threshold(ScoreType threshold) { _score_threshold.store(thr
 
 YOLO::ScoreType YOLO::get_score_threshold() const { return _score_threshold.load(); }
 
-void YOLO::set_nms_threshold(NMSThresholdType threshold) { _nms_threshold.store(threshold); }
+void YOLO::set_iou_threshold(NMSThresholdType threshold) { _iou_threshold.store(threshold); }
 
-YOLO::NMSThresholdType YOLO::get_nms_threshold() const { return _nms_threshold.load(); }
+YOLO::NMSThresholdType YOLO::get_iou_threshold() const { return _iou_threshold.load(); }
 
 void YOLO::set_algorithm_config(const ConfigType& config) {
     set_score_threshold(config.score_threshold);
-    set_nms_threshold(config.nms_threshold);
+    set_iou_threshold(config.iou_threshold);
 }
 
 YOLO::ConfigType YOLO::get_algorithm_config() const {
-    return ConfigType{.score_threshold = get_score_threshold(), .nms_threshold = get_nms_threshold()};
+    return ConfigType{.score_threshold = get_score_threshold(), .iou_threshold = get_iou_threshold()};
 }
 
 }  // namespace edgelab::algorithm

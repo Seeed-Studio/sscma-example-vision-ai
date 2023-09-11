@@ -26,8 +26,10 @@
 #ifndef _EL_DATA_STORAGE_HPP_
 #define _EL_DATA_STORAGE_HPP_
 
+#ifdef USE_FREERTOS
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
+#endif
 
 #include <algorithm>
 #include <cstddef>
