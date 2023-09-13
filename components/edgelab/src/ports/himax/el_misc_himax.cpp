@@ -35,7 +35,7 @@
 
 namespace edgelab {
 
-EL_ATTR_WEAK void el_sleep(uint32_t ms) { board_delay_ms(ms); }
+EL_ATTR_WEAK void el_sleep(uint32_t ms) { board_delay_cycle(ms*400000); }
 
 EL_ATTR_WEAK uint64_t el_get_time_ms(void) { return (uint64_t)board_get_cur_us() / 1000; }
 
