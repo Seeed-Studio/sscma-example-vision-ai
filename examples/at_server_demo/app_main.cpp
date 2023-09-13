@@ -6,6 +6,13 @@
 #include "at_callbacks.hpp"
 #include "at_utility.hpp"
 #include "edgelab.h"
+#include "hx_drv_timer.h"
+
+void timer_callback(void *data)
+{
+    edgelab::repl::ReplExecutor* classptr = reinterpret_cast<edgelab::repl::ReplExecutor*>(data);
+    classptr->run();
+}
 
 int main(void) {
     // get resource handler and init resources
@@ -56,28 +63,32 @@ int main(void) {
 
     instance->register_cmd(
       "ID?", "Get device ID", "", el_repl_cmd_cb_t([&](std::vector<std::string> argv) {
-          at_get_device_id(argv[0]);
+          executor->add_task([&, cmd = std::string(argv[0])](std::atomic<bool>& stop_token) { at_get_device_id(cmd); });
           return EL_OK;
       }));
 
     instance->register_cmd("NAME?", "Get device name", "", el_repl_cmd_cb_t([&](std::vector<std::string> argv) {
-                                   at_get_device_name(argv[0]);
+                               executor->add_task([&, cmd = std::string(argv[0])](std::atomic<bool>& stop_token) {
+                                   at_get_device_name(cmd);
+                               });
                                return EL_OK;
                            }));
 
     instance->register_cmd("STAT?", "Get device status", "", el_repl_cmd_cb_t([&](std::vector<std::string> argv) {
-                                   at_get_device_status(argv[0], boot_count, current_model_id, current_sensor_id);
+                               executor->add_task([&, cmd = std::string(argv[0])](std::atomic<bool>& stop_token) {
+                                   at_get_device_status(cmd, boot_count, current_model_id, current_sensor_id);
+                               });
                                return EL_OK;
                            }));
 
     instance->register_cmd(
       "VER?", "Get version details", "", el_repl_cmd_cb_t([&](std::vector<std::string> argv) {
-          at_get_version(argv[0]);
+          executor->add_task([&, cmd = std::string(argv[0])](std::atomic<bool>& stop_token) { at_get_version(cmd); });
           return EL_OK;
       }));
 
     instance->register_cmd("RST", "Reboot device", "", el_repl_cmd_cb_t([&](std::vector<std::string> argv) {
-                               device->restart();
+                               executor->add_task([&](std::atomic<bool>& stop_token) { device->restart(); });
                                return EL_OK;
                            }));
 
@@ -99,27 +110,34 @@ int main(void) {
 
     instance->register_cmd(
       "ALGOS?", "Get available algorithms", "", el_repl_cmd_cb_t([&](std::vector<std::string> argv) {
-          at_get_available_algorithms(argv[0]);
+          executor->add_task(
+            [&, cmd = std::string(argv[0])](std::atomic<bool>& stop_token) { at_get_available_algorithms(cmd); });
           return EL_OK;
       }));
 
     // // TODO: algorithm config command
 
     instance->register_cmd("MODELS?", "Get available models", "", el_repl_cmd_cb_t([&](std::vector<std::string> argv) {
-                                   at_get_available_models(argv[0]);
+                               executor->add_task([&, cmd = std::string(argv[0])](std::atomic<bool>& stop_token) {
+                                   at_get_available_models(cmd);
+                               });
                                return EL_OK;
                            }));
 
     instance->register_cmd(
       "MODEL", "Load a model by model ID", "MODEL_ID", el_repl_cmd_cb_t([&](std::vector<std::string> argv) {
-                uint8_t model_id = std::atoi(argv[1].c_str());
-                at_set_model(argv[0], model_id, engine, current_model_id);
+          uint8_t model_id = std::atoi(argv[1].c_str());
+          executor->add_task(
+            [&, cmd = std::string(argv[0]), model_id = std::move(model_id)](std::atomic<bool>& stop_token) {
+                at_set_model(cmd, model_id, engine, current_model_id);
+            });
           return EL_OK;
       }));
 
     instance->register_cmd(
       "SENSORS?", "Get available sensors", "", el_repl_cmd_cb_t([&](std::vector<std::string> argv) {
-          at_get_available_sensors(argv[0]);
+          executor->add_task(
+            [&, cmd = std::string(argv[0])](std::atomic<bool>& stop_token) { at_get_available_sensors(cmd); });
           return EL_OK;
       }));
 
@@ -130,7 +148,9 @@ int main(void) {
       el_repl_cmd_cb_t([&](std::vector<std::string> argv) {
           uint8_t sensor_id = std::atoi(argv[1].c_str());
           bool    enable    = std::atoi(argv[2].c_str()) ? true : false;
-          at_set_sensor(argv[0], sensor_id, enable, current_sensor_id);
+          executor->add_task(
+            [&, cmd = std::string(argv[0]), sensor_id = std::move(sensor_id), enable = std::move(enable)](
+              std::atomic<bool>& stop_token) { at_set_sensor(cmd, sensor_id, enable, current_sensor_id); });
           return EL_OK;
       }));
 
@@ -184,6 +204,15 @@ int main(void) {
 
     // start task executor
     executor->start();
+
+    TIMER_T timer_data = {
+        .function = timer_callback,
+        .timeout = 0,
+        .data = executor,
+        .one_shot = false,
+    };
+    hx_drv_timer_init();
+    hx_drv_timer_start(&timer_data);
 #if 0
     // setup components
     {

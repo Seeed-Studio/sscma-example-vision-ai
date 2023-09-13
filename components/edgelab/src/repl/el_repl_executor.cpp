@@ -70,6 +70,10 @@ void ReplExecutor::start() {
 #ifdef USE_FREERTOS
     _worker_ret =
       xTaskCreate(&ReplExecutor::c_run, _worker_name, _worker_stack_size, this, _worker_priority, &_worker_handler);
+#elif defined(NON_RTOS)
+    //In the system without rtos, we use a timer callback to drive the background at server.
+    //So we need to make the ReplExecutor::run exec only once in every timer callback.
+    _worker_thread_stop_requested.store(true, std::memory_order_relaxed);
 #endif
 }
 
@@ -94,7 +98,8 @@ inline void ReplExecutor::m_lock() const { el_semaphoretake(_task_queue_lock, el
 inline void ReplExecutor::m_unlock() const { el_semaphoregive(_task_queue_lock); }
 
 void ReplExecutor::run() {
-    while (!_worker_thread_stop_requested.load(std::memory_order_relaxed)) {
+    do
+    {
         types::el_repl_task_t task;
         {
             m_lock();
@@ -111,7 +116,7 @@ void ReplExecutor::run() {
         if (task) task(_task_stop_requested);
         //vTaskDelay(15 / portTICK_PERIOD_MS);  // TODO: use yield
         el_sleep(15);
-    }
+    }while (!_worker_thread_stop_requested.load(std::memory_order_relaxed));
 }
 
 void ReplExecutor::c_run(void* this_pointer) { static_cast<ReplExecutor*>(this_pointer)->run(); }
