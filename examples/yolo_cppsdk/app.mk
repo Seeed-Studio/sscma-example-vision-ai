@@ -26,7 +26,7 @@ SCENARIO_APP_CXXSRCS = $(call get_cxxsrcs, $(SCENARIO_APP_INCDIR))
 SCENARIO_APP_CCSRCS = $(call get_ccsrcs, $(SCENARIO_APP_INCDIR))
 SCENARIO_APP_ASMSRCS = $(call get_asmsrcs, $(SCENARIO_APP_ASMSRCDIR))
 
-ALGO_CONFIG_FILE := $(shell realpath ./examples/${APP}/algorithm.conf)
+ALGO_CONFIG_FILE := $(shell realpath ./examples/${APP}/app.conf)
 
 ifneq ($(wildcard $(ALGO_CONFIG_FILE)),)
 LINES := $(shell cat $(ALGO_CONFIG_FILE))
