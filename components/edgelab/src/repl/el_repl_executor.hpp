@@ -61,12 +61,12 @@ class ReplExecutor {
     void add_task(types::el_repl_task_t task);
 
     const char* get_worker_name() const;
+    void        run();
 
    protected:
     void m_lock() const;
     void m_unlock() const;
 
-    void        run();
     static void c_run(void* this_pointer);
 
    private:
