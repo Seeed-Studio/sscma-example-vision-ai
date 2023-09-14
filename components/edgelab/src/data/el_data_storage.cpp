@@ -39,14 +39,14 @@
 
 namespace edgelab::data {
 
-Storage::Storage() noexcept : __lock(xSemaphoreCreateCounting(1, 1)), __kvdb(new fdb_kvdb{}) {
+Storage::Storage() noexcept : __lock(el_SemaphoreCreateCounting(1, 1)), __kvdb(new fdb_kvdb{}) {
     EL_ASSERT(__lock);
     EL_ASSERT(__kvdb);
 }
 
 Storage::~Storage() {
     deinit();
-    vSemaphoreDelete(__lock);
+    el_SemaphoreDelete(__lock);
 };
 
 el_err_code_t Storage::init(const char* name, const char* path) {

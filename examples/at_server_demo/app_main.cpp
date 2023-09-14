@@ -24,7 +24,7 @@ int main(void) {
     auto* executor      = repl->get_executor_handler();
     auto* data_delegate = DataDelegate::get_delegate();
     auto* models        = data_delegate->get_models_handler();
-    // auto* storage       = data_delegate->get_storage_handler();
+    auto* storage       = data_delegate->get_storage_handler();
     auto* engine        = new InferenceEngine();
 
     // init resource

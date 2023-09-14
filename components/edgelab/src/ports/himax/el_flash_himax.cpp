@@ -24,6 +24,8 @@
  */
 
 #include "el_flash_himax.h"
+#include "internal_flash.h"
+#include "embARC_debug.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,6 +41,52 @@ el_err_code_t el_model_partition_mmap_init(const char*              partition_na
 }
 
 void el_model_partition_mmap_deinit(el_model_mmap_handler_t* mmap_handler) {}
+
+static int el_flash_db_init(void) {
+
+    return 1;
+}
+
+static int el_flash_db_read(long offset, uint8_t* buf, size_t size) {
+    int8_t ret = 0;
+    uint32_t addr = el_flash_db_nor_flash0.addr + offset;
+
+    ret = internal_flash_read(addr, buf, size);
+    //EMBARC_PRINTF("flash db read 0x%08x 0x%08x str:%s\n", addr, size, buf);
+    return ret;
+}
+
+static int el_flash_db_write(long offset, const uint8_t* buf, size_t size) {
+    int8_t ret = 0;
+    uint32_t addr = el_flash_db_nor_flash0.addr + offset;
+    //EMBARC_PRINTF("flash db write 0x%08x 0x%08x str:%s\n", addr, size, buf);
+    ret = internal_flash_write(addr, (void *)buf, size);
+
+    return ret;
+}
+
+static int el_flash_db_erase(long offset, size_t size) {
+    int8_t ret = 0;
+    uint32_t addr = el_flash_db_nor_flash0.addr + offset;
+    //EMBARC_PRINTF("flash db erase 0x%08x 0x%08x\n", addr, size);
+    ret = internal_flash_clear(addr, size);
+
+    return ret;
+}
+
+#ifdef CONFIG_EL_LIB_FLASHDB
+
+const struct fal_flash_dev el_flash_db_nor_flash0 = {
+  {.name       = CONFIG_EL_STORAGE_PARTITION_MOUNT_POINT},
+  //0x200000 is the flash size of himax6538, 0x10000 is the data size for flashdb
+  .addr       = (0x200000 - 0x10000),
+  .len        = 0x10000,
+  .blk_size   = FDB_BLOCK_SIZE,
+  .ops        = {el_flash_db_init, el_flash_db_read, el_flash_db_write, el_flash_db_erase},
+  .write_gran = FDB_WRITE_GRAN,
+};
+
+#endif
 
 #ifdef __cplusplus
 }

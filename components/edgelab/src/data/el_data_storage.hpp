@@ -79,7 +79,7 @@ static inline constexpr edgelab::data::types::el_storage_kv_t<ValueTypeNoCV> el_
 
 static inline constexpr unsigned long djb2_hash(const unsigned char* bytes) {
     unsigned long hash = 0x1505;
-    unsigned char byte;
+    unsigned char byte = 0;
     while ((byte = *bytes++)) hash = ((hash << 5) + hash) + byte;
     return hash;
 }
@@ -92,7 +92,7 @@ template <typename T> static inline constexpr const char* get_type_name() { retu
 //          a. too compilcate to use const difference to determine whether to delete the key (need to set to nullptr while copy/assign, etc.)
 //          b. not wise to use a bool flag to dertermine whether to delete the key (because copy/assign would be a continuation of the key)
 template <typename VarType, typename ValueTypeNoCV = typename std::remove_cv<VarType>::type>
-static inline constexpr edgelab::data::types::el_storage_kv_t<ValueTypeNoCV> el_make_storage_kv_from_type(
+static inline edgelab::data::types::el_storage_kv_t<ValueTypeNoCV> el_make_storage_kv_from_type(
   VarType&& data) {
     using VarTypeNoCVRef               = typename std::remove_cv<typename std::remove_reference<VarType>::type>::type;
     const char*          type_name     = get_type_name<VarTypeNoCVRef>();
@@ -126,7 +126,7 @@ static inline constexpr edgelab::data::types::el_storage_kv_t<ValueTypeNoCV> el_
 class Storage {
    public:
     // currently the consistent of Storage is only ensured on a single instance if there're multiple instances that has same name and save path
-    Storage();
+    Storage() noexcept;
     ~Storage();
 
     Storage(const Storage&)            = delete;
@@ -274,8 +274,8 @@ class Storage {
     bool reset();
 
    protected:
-    inline void m_lock() const noexcept { xSemaphoreTake(__lock, portMAX_DELAY); }
-    inline void m_unlock() const noexcept { xSemaphoreGive(__lock); }
+    inline void m_lock() const noexcept { el_semaphoretake(_task_queue_lock, el_MAX_DELAY); }
+    inline void m_unlock() const noexcept { el_semaphoregive(_task_queue_lock); }
 
     struct Guard {
         Guard(const Storage* const storage) noexcept : ___storage(storage) { ___storage->m_lock(); }
@@ -288,7 +288,7 @@ class Storage {
     };
 
    private:
-    mutable SemaphoreHandle_t __lock;
+    mutable el_semaphore __lock;
     fdb_kvdb_t                __kvdb;
 };
 

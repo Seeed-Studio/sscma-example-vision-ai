@@ -26,6 +26,7 @@
 #ifndef _EL_FLASH_HIMAX_H_
 #define _EL_FLASH_HIMAX_H_
 
+#include "el_config_internal.h"
 #include "el_types.h"
 
 #ifdef __cplusplus
@@ -41,6 +42,42 @@ el_err_code_t el_model_partition_mmap_init(const char*              partition_na
                                            el_model_mmap_handler_t* mmap_handler);
 
 void el_model_partition_mmap_deinit(el_model_mmap_handler_t* mmap_handler);
+
+#ifdef CONFIG_EL_LIB_FLASHDB
+    #include <fal_def.h>
+
+    #define NOR_FLASH_DEV_NAME CONFIG_EL_STORAGE_PARTITION_MOUNT_POINT
+    #define FAL_FLASH_DEV_TABLE \
+        { &el_flash_db_nor_flash0, }
+
+    #define FAL_PART_HAS_TABLE_CFG
+    #ifdef FAL_PART_HAS_TABLE_CFG
+        #define FAL_PART_TABLE                          \
+            {                                           \
+                {FAL_PART_MAGIC_WORD,                   \
+                 CONFIG_EL_STORAGE_PARTITION_FS_NAME_0, \
+                 NOR_FLASH_DEV_NAME,                    \
+                 0,                                     \
+                 CONFIG_EL_STORAGE_PARTITION_FS_SIZE_0, \
+                 0},                                    \
+            }
+    #endif
+
+    #define FDB_USING_KVDB
+    #ifdef FDB_USING_KVDB
+        #define FDB_KV_AUTO_UPDATE
+    #endif
+    #define FDB_USING_FAL_MODE
+    #define FDB_WRITE_GRAN       (32)
+    #define FDB_BLOCK_SIZE (4 * 1024)
+
+    #ifdef CONFIG_EL_DEBUG
+        #define FDB_DEBUG_ENABLE
+    #endif
+
+extern const struct fal_flash_dev el_flash_db_nor_flash0;
+
+#endif
 
 #ifdef __cplusplus
 }
