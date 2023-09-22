@@ -1,0 +1,3 @@
+[submodule "components/sscma-micro"]
+	path = components/sscma-micro
+	url = https://github.com/iChizer0/SSCMA-Micro

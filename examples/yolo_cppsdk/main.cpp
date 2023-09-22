@@ -5,9 +5,13 @@
 #include "hx_drv_webusb.h"
 #include "datapath.h"
 #include "sensor_core.h"
-#include "edgelab.h"
+#include "core/edgelab.h"
+#include "porting/himax/el_camera_himax.h"
 
 #include "yolo_model_data.h"
+
+using namespace edgelab;
+using namespace edgelab::types;
 
 #define kTensorArenaSize (800 * 1024)
 
@@ -36,7 +40,7 @@ int main()
     debugger_init();
     hx_drv_timer_init();
 
-    auto* engine       = new InferenceEngine();
+    auto* engine       = new EngineTFLite();
     auto* tensor_arena = malloc_buf;
     ret = engine->init(tensor_arena, kTensorArenaSize);
     ret = engine->load_model(g_yolo_model_data, g_yolo_model_data_len);
@@ -47,7 +51,7 @@ int main()
         el_printf("Frame: %d\r", frame++);
         el_img_t web_img, algo_img;
         camera->start_stream();
-        camera->get_jpeg(&web_img);
+        reinterpret_cast<edgelab::CameraHimax*>(camera)->get_jpeg(&web_img);
         camera->get_frame(&algo_img);
 
         algorithm->run(&algo_img);
