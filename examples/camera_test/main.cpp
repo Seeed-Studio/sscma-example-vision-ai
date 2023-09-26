@@ -5,7 +5,11 @@
 #include "hx_drv_webusb.h"
 #include "datapath.h"
 #include "sensor_core.h"
-#include "edgelab.h"
+#include "core/edgelab.h"
+#include "porting/himax/el_camera_himax.h"
+
+using namespace edgelab;
+using namespace edgelab::types;
 
 int main()
 {
@@ -26,7 +30,7 @@ int main()
         LOGGER_INFO("Frame: %d\r", frame++);
         el_img_t img;
         camera->start_stream();
-        camera->get_jpeg(&img);
+        reinterpret_cast<CameraHimax*>(camera)->get_jpeg(&img);
 
         hx_drv_webusb_write_vision(img.data, img.size);
     }

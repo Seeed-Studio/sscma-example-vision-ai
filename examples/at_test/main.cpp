@@ -1,9 +1,16 @@
-#include "edgelab.h"
+#include "core/edgelab.h"
+#include "sscma/repl/server.hpp"
+#include "sscma/repl/executor.hpp"
+
+using namespace edgelab;
+using namespace edgelab::types;
+using namespace sscma;
+using namespace sscma::types;
 
 #define REPLY_CMD_HEADER "\r{\"type\": 0, "
 #define REPLY_LOG_HEADER "\r{\"type\": 2, "
 
-void at_print_help(std::forward_list<el_repl_cmd_t> cmd_list) {
+void at_print_help(std::forward_list<repl_cmd_t> cmd_list) {
     auto* serial = Device::get_device()->get_serial();
     char buffer[512] = {0};
     int length = 0;
@@ -25,7 +32,7 @@ void at_server_echo_cb(el_err_code_t ret, const std::string& msg) {
     char buffer[512] = {0};
 
     if (ret != EL_OK) {
-        snprintf(buffer, sizeof(buffer), "%s\"name\": \"AT\", \"code\": %d, \"data\": %s}\n", 
+        snprintf(buffer, sizeof(buffer), "%s\"name\": \"AT\", \"code\": %d, \"data\": %s}\n",
             REPLY_LOG_HEADER, (int)ret, msg.c_str());
     }
 
@@ -38,7 +45,7 @@ void at_get_device_id(const std::string& cmd) {
     auto* serial = device->get_serial();
     char buffer[512] = {0};
 
-    snprintf(buffer, sizeof(buffer), "%s\"name\": \"%s\", \"code\": %d, \"data\": \"0x%x\"}\n", 
+    snprintf(buffer, sizeof(buffer), "%s\"name\": \"%s\", \"code\": %d, \"data\": \"0x%x\"}\n",
         REPLY_CMD_HEADER, cmd.c_str(), static_cast<int>(EL_OK), device->get_device_id());
 
     std::string str(buffer);
@@ -51,9 +58,8 @@ int main()
 
     Device* device  = Device::get_device();
     Serial* serial  = device->get_serial();
-    auto* repl          = ReplDelegate::get_delegate();
-    auto* instance      = repl->get_server_handler();
-    auto* executor      = repl->get_executor_handler();
+    auto* instance      = new repl::Server()
+    auto* executor      = new repl::Executor();
 
     //TODO: need to fix
     //add this delay for console output ready
@@ -71,7 +77,7 @@ int main()
         return EL_OK;
     });
 
-    instance->register_cmd("ID?", "Get device ID", "", el_repl_cmd_cb_t([&](std::vector<std::string> argv) {
+    instance->register_cmd("ID?", "Get device ID", "", repl_cmd_cb_t([&](std::vector<std::string> argv) {
                                at_get_device_id(argv[0]);
                                return EL_OK;
                            }));

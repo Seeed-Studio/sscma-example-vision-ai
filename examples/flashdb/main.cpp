@@ -1,9 +1,14 @@
-#include "edgelab.h"
+#include "core/edgelab.h"
+
+using namespace edgelab;
+using namespace edgelab::types;
+using namespace edgelab::utility;
+
+#include <cstdio>
 
 int main()
 {
-    auto* data_delegate = DataDelegate::get_delegate();
-    auto* storage       = data_delegate->get_storage_handler();
+    auto* storage       = new Storage();
     int32_t boot_count  = 0;
 
     //TODO: need to fix

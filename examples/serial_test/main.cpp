@@ -1,4 +1,7 @@
-#include "edgelab.h"
+#include "core/edgelab.h"
+
+using namespace edgelab;
+using namespace edgelab::types;
 
 int main()
 {

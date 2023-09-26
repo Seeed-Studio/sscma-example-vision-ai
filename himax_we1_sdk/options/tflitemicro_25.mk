@@ -147,11 +147,11 @@ $(LIB_CV_DIR)/tensorflow/lite/micro/kernels/tanh.cc \
 $(LIB_CV_DIR)/tensorflow/lite/micro/kernels/transpose.cc \
 $(LIB_CV_DIR)/tensorflow/lite/micro/kernels/transpose_conv.cc \
 $(LIB_CV_DIR)/tensorflow/lite/micro/kernels/unpack.cc \
-$(LIB_CV_DIR)/tensorflow/lite/micro/kernels/zeros_like.cc 
+$(LIB_CV_DIR)/tensorflow/lite/micro/kernels/zeros_like.cc
 
 
 ifeq ($(ALGO_TYPE), TFLITE_MICRO_YOLO_FASTEST)
-	ifeq (YOLO_FASTEST_HUMAN_DETECTION, $(findstring YOLO_FASTEST_HUMAN_DETECTION, $(APPL_DEFINES))) 
+	ifeq (YOLO_FASTEST_HUMAN_DETECTION, $(findstring YOLO_FASTEST_HUMAN_DETECTION, $(APPL_DEFINES)))
 		LIB_CV_CCSRCS += $(LIB_CV_DIR)/examples/yolo_coco/yolo_coco.cc
 	endif
 endif
@@ -182,8 +182,8 @@ ifeq ($(ALGO_TYPE), TFLITE_MICRO_HIMAX_PERSON)
 			else ifeq (AMR_CR_DEMO_FIX_LAYOUT_5CM_DATASET, $(findstring AMR_CR_DEMO_FIX_LAYOUT_5CM_DATASET, $(APPL_DEFINES)))
 				LIB_CV_CCSRCS += $(LIBRARIES_ROOT)/cv/himax/model/AMR_CR_DEMO_FIX_LAYOUT_5CM.cc#AMR_CR_DEMO_FIX_LAYOUT_5CM.cc
 			endif
-			
-		endif	
+
+		endif
 		# static hand gesture
 		ifeq (HX_VIP_STATIC_GESTURE_320x240, $(findstring HX_VIP_STATIC_GESTURE_320x240, $(APPL_DEFINES)))
 			LIB_CV_CCSRCS += $(LIBRARIES_ROOT)/cv/himax/model/HGR_tiny_hands_3_mix_44_L.cc
@@ -197,25 +197,25 @@ ifeq ($(ALGO_TYPE), TFLITE_MICRO_HIMAX_PERSON)
 			LIB_CV_CCSRCS += $(LIBRARIES_ROOT)/cv/himax/model/vip_gesture_mix_91_MobileNetV2.cc
 		else ifeq (HX_VIP_STATIC_GESTURE_27_320x240, $(findstring HX_VIP_STATIC_GESTURE_27_320x240, $(APPL_DEFINES)))
 			LIB_CV_CCSRCS += $(LIBRARIES_ROOT)/cv/himax/model/vip_gesture_sc_bg_ft_27_MobileNetV2.cc
-		else ifeq (HX_VIP_HAND_CROP_96_GESTURE_M1_1_25_64x64, $(findstring HX_VIP_HAND_CROP_96_GESTURE_M1_1_25_64x64, $(APPL_DEFINES)))		
+		else ifeq (HX_VIP_HAND_CROP_96_GESTURE_M1_1_25_64x64, $(findstring HX_VIP_HAND_CROP_96_GESTURE_M1_1_25_64x64, $(APPL_DEFINES)))
 			LIB_CV_CCSRCS += $(LIBRARIES_ROOT)/cv/himax/model/vip_hand_crop_96_gesture_M1_1.25_64x64.cc
 		endif
-		
+
 		#FD
 		ifeq (BIG_MODEL, $(findstring BIG_MODEL, $(APPL_DEFINES)))
 			LIB_CV_CCSRCS += $(LIBRARIES_ROOT)/cv/himax/model/_224_6anchors_YOMOv4_S_CIOU_gamma0.2to4_more.cc
 		else ifeq (SMALL_MODEL, $(findstring SMALL_MODEL, $(APPL_DEFINES)))
 			LIB_CV_CCSRCS += $(LIBRARIES_ROOT)/cv/himax/model/FD_2b_c9_pana03_20211210.cc
-		endif	
-	
+		endif
+
 		ifeq (TEST_TIME, $(findstring TEST_TIME, $(APPL_DEFINES)))
 			LIB_CV_CCSRCS += $(LIBRARIES_ROOT)/cv/himax/model/FD_2b_c9.cc
-		endif		
-		
-		
-		
-		
-		
+		endif
+
+
+
+
+
 		ifeq (AIOT_YUNTAI_VIP, $(findstring AIOT_YUNTAI_VIP, $(APPL_DEFINES)))
 			ifeq (YUNTAI_FD_HGC_KCF, $(findstring YUNTAI_FD_HGC_KCF, $(APPL_DEFINES)))
 			    ifeq (BIG_MODEL, $(findstring BIG_MODEL, $(APPL_DEFINES)))
@@ -227,7 +227,7 @@ ifeq ($(ALGO_TYPE), TFLITE_MICRO_HIMAX_PERSON)
 				LIB_CV_CCSRCS += $(LIBRARIES_ROOT)/cv/himax/model/vip_hand_crop_92_gesture_M1_d16_b2_2c_48x48_palm.cc
 			endif
 		endif
-		
+
 	else
 		LIB_CV_CCSRCS += $(LIBRARIES_ROOT)/cv/himax/model/yolo_PTQ_int8.cc
 	endif
@@ -246,8 +246,8 @@ LIB_CV_OBJS = $(LIB_CV_COBJS) $(LIB_CV_ASMOBJS) $(LIB_CV_CXXOBJS) $(LIB_CV_CCOBJ
 #CV_CCFLAGS +=  -DNDEBUG -g -DTF_LITE_STATIC_MEMORY -DEMBARC_TCF_GENERATED -Hnocopyr -O3 -Hpurge -Hcl -fslp-vectorize-aggressive -ffunction-sections -fdata-sections
 #CV_CXXFLAGS += -DSCRATCH_MEM_Z_SIZE=0x10000
 
-APPL_DEFINES += -O3 -DNDEBUG -g -DTF_LITE_STATIC_MEMORY -DEMBARC_TCF_GENERATED -Os -ffunction-sections -fdata-sections
-APPL_DEFINES +=  -DNDEBUG -g -DTF_LITE_STATIC_MEMORY -DEMBARC_TCF_GENERATED -Os -ffunction-sections -fdata-sections
+# APPL_DEFINES +=  -DNDEBUG -g -DTF_LITE_STATIC_MEMORY -DEMBARC_TCF_GENERATED -Os -ffunction-sections -fdata-sections
+APPL_DEFINES +=  -DNDEBUG -DTF_LITE_STATIC_MEMORY -DEMBARC_TCF_GENERATED -Os -ffunction-sections -fdata-sections
 ifeq ($(TOOLCHAIN), mw)
 APPL_DEFINES += -fno-rtti -Hnocopyr -Hpurge -Hcl -fslp-vectorize-aggressive
 APPL_DEFINES += -Hnocopyr -Hpurge -Hcl -fslp-vectorize-aggressive
@@ -320,7 +320,7 @@ ifeq ($(ALGO_TYPE), TFLITE_MICRO_YOLO_FASTEST)
 	endif
 endif
 endif
-$(warning $(CV_LIB)) 
+$(warning $(CV_LIB))
 $(CV_LIB) :
 	$(CP) $(CV_PREBUILT_LIB) $(CV_LIB)
 else

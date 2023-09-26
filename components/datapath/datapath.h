@@ -33,7 +33,7 @@ typedef struct {
     WE1AppCfg_THROUGH_CV_e through_cv;
 
     /*
-    In order to get a better image. we ignore the 
+    In order to get a better image. we ignore the
     first few pictures.
     */
     uint8_t ignore_first_x_pics;
@@ -76,6 +76,7 @@ extern "C"
 #endif
     ERROR_T datapath_init(uint16_t width, uint16_t height);
     ERROR_T datapath_start_work(void);
+    void datapath_stop_work();
     bool datapath_get_img_state();
     int datapath_restart();
     void datapath_get_jpeg_img(uint32_t *jpeg_enc_addr, uint32_t *jpeg_enc_filesize);

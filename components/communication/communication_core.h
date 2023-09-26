@@ -2,7 +2,7 @@
 #define COMMUNICATION_H
 
 #include "grove_ai_config.h"
-#include <stdio.h>
+#include <stdint.h>
 
 int8_t communication_init(void);
 
