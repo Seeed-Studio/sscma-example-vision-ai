@@ -409,26 +409,34 @@ $(APPL_LINK_FILE): $(LINKER_SCRIPT_FILE) $$(COMMON_COMPILE_PREREQUISITES)
 
 #####RULES FOR GENERATING ELF FILE#####
 .SECONDEXPANSION:
-$(APPL_FULL_NAME).elf : $(ALL_GENERATED_DIRS_TMPFILES) $(CORE_ARG_FILES) $(APPL_LINK_FILE) $(APPL_OBJS) $(EXTRA_OBJS) $(INTEGRATE_OBJS) $(HWACCAUTOTEST_OBJS) $(SCENARIO_APP_OBJS) $(EVENTHANDLER_OBJS) $(EMBARC_LIB) $(OKAO_LIB) $(BOARD_OPEN_LIB_SOCKET) $(CV_LIB) $(LIB_LIB_DSP) $(BSS_LIB) $(MLI_LIB) $(SECURE_LIB) $(AUDIO_ALGO_LIB) $(ALANGO_ALGO_LIB) $(GNU_DEP_LIB) $(OPEN_LIBS) $$(COMMON_COMPILE_PREREQUISITES)
+$(APPL_FULL_NAME).elf : $(ALL_GENERATED_DIRS_TMPFILES) $(CORE_ARG_FILES) $(APPL_LINK_FILE) $(APPL_OBJS) $(EXTRA_OBJS) $(INTEGRATE_OBJS) $(HWACCAUTOTEST_OBJS) $(SCENARIO_APP_OBJS) $(EVENTHANDLER_OBJS) $(EMBARC_LIB) $(OKAO_LIB) $(BOARD_OPEN_LIB_SOCKET) $(CV_LIB) $(LIB_LIB_DSP) $(BSS_LIB) $(MLI_LIB) $(SECURE_LIB) $(AUDIO_ALGO_LIB) $(ALANGO_ALGO_LIB) $(GNU_DEP_LIB) $(OPEN_LIBS) $(OS_LIBS) $$(COMMON_COMPILE_PREREQUISITES)
 	$(TRACE_LINK)
-	$(Q)$(LD) $(LINK_OPT) $(APPL_OBJS) $(EXTRA_OBJS) $(INTEGRATE_OBJS) $(HWACCAUTOTEST_OBJS) $(SCENARIO_APP_OBJS) $(EVENTHANDLER_OBJS) $(LD_START_GROUPLIB) $(EMBARC_LIB) $(OKAO_LIB) $(BOARD_OPEN_LIB_SOCKET) $(CV_LIB) $(LIB_LIB_DSP) $(BSS_LIB) $(MLI_LIB) $(SECURE_LIB) $(AUDIO_ALGO_LIB) $(ALANGO_ALGO_LIB) $(GNU_DEP_LIB) $(APPL_LIBS) $(OPEN_LIBS) $(LD_SYSTEMLIBS) $(LD_END_GROUPLIB)  -o $@
+	$(Q)$(LD) $(LINK_OPT) $(APPL_OBJS) $(EXTRA_OBJS) $(INTEGRATE_OBJS) $(HWACCAUTOTEST_OBJS) $(SCENARIO_APP_OBJS) $(EVENTHANDLER_OBJS) $(LD_START_GROUPLIB) $(EMBARC_LIB) $(OKAO_LIB) $(BOARD_OPEN_LIB_SOCKET) $(CV_LIB) $(LIB_LIB_DSP) $(BSS_LIB) $(MLI_LIB) $(SECURE_LIB) $(AUDIO_ALGO_LIB) $(ALANGO_ALGO_LIB) $(GNU_DEP_LIB) $(APPL_LIBS) $(OPEN_LIBS) $(LD_SYSTEMLIBS) $(LD_END_GROUPLIB) $(OS_LIBS) -o $@
 
 #####RULES FOR ACHIEVING PRE-BUILT BSP LIBRARY#####
 ifeq ($(LIB_BSP_PREBUILT), 1)
 $(EMBARC_LIB) : 
 ifeq "$(HOST_OS)" "Windows"
 ifeq ($(IC_PACKAGE_SEL), LQFP128)
-ifeq ($(OS_TYPE), )
+ifeq ($(OS_TYPE), ) 
 	$(CP) .\library\prebuilt_lib\libembarc_128pin_mw.a $(BOARD_OUT_DIR)\$(BUILD_INFO)\libembarc.a
 else
+ifeq ($(LIB_OS_PREBUILT), 1)
 	$(CP) .\library\prebuilt_lib\libembarc_128pin_mw_os.a $(BOARD_OUT_DIR)\$(BUILD_INFO)\libembarc.a
+else
+	$(CP) .\library\prebuilt_lib\libembarc_128pin_mw.a $(BOARD_OUT_DIR)\$(BUILD_INFO)\libembarc.a
+endif
 endif
 endif
 ifeq ($(IC_PACKAGE_SEL), WLCSP38)
 ifeq ($(OS_TYPE), )	
 	$(CP) .\library\prebuilt_lib\libembarc_38pin_mw.a $(BOARD_OUT_DIR)\$(BUILD_INFO)\libembarc.a
 else
+ifeq ($(LIB_OS_PREBUILT), 1)
 	$(CP) .\library\prebuilt_lib\libembarc_38pin_mw_os.a $(BOARD_OUT_DIR)\$(BUILD_INFO)\libembarc.a
+else
+	$(CP) .\library\prebuilt_lib\libembarc_38pin_mw.a $(BOARD_OUT_DIR)\$(BUILD_INFO)\libembarc.a
+endif
 endif
 endif
 ifeq ($(IC_PACKAGE_SEL), QFP100)
@@ -438,7 +446,11 @@ ifeq ($(IC_PACKAGE_SEL), QFN72)
 ifeq ($(OS_TYPE), )	
 	$(CP) .\library\prebuilt_lib\libembarc_72pin_mw.a $(BOARD_OUT_DIR)\$(BUILD_INFO)\libembarc.a
 else
+ifeq ($(LIB_OS_PREBUILT), 1)
 	$(CP) .\library\prebuilt_lib\libembarc_72pin_mw_os.a $(BOARD_OUT_DIR)\$(BUILD_INFO)\libembarc.a
+else
+	$(CP) .\library\prebuilt_lib\libembarc_72pin_mw.a $(BOARD_OUT_DIR)\$(BUILD_INFO)\libembarc.a
+endif
 endif	
 endif
 else
@@ -447,13 +459,21 @@ ifeq ($(TOOLCHAIN), mw)
 ifeq ($(OS_TYPE), )
 	$(CP) ./library/prebuilt_lib/libembarc_128pin_mw.a $(BOARD_OUT_DIR)/$(BUILD_INFO)/libembarc.a
 else
+ifeq ($(LIB_OS_PREBUILT), 1)
 	$(CP) ./library/prebuilt_lib/libembarc_128pin_mw_os.a $(BOARD_OUT_DIR)/$(BUILD_INFO)/libembarc.a
+else
+	$(CP) ./library/prebuilt_lib/libembarc_128pin_mw.a $(BOARD_OUT_DIR)/$(BUILD_INFO)/libembarc.a
+endif
 endif
 else	
 ifeq ($(OS_TYPE), )
 	$(CP) ./library/prebuilt_lib/libembarc_128pin_gnu.a $(BOARD_OUT_DIR)/$(BUILD_INFO)/libembarc.a
 else
+ifeq ($(LIB_OS_PREBUILT), 1)
 	$(CP) ./library/prebuilt_lib/libembarc_128pin_gnu_os.a $(BOARD_OUT_DIR)/$(BUILD_INFO)/libembarc.a
+else
+	$(CP) ./library/prebuilt_lib/libembarc_128pin_gnu.a $(BOARD_OUT_DIR)/$(BUILD_INFO)/libembarc.a
+endif
 endif	
 endif	
 endif
@@ -462,13 +482,21 @@ ifeq ($(TOOLCHAIN), mw)
 ifeq ($(OS_TYPE), )	
 	$(CP) ./library/prebuilt_lib/libembarc_38pin_mw.a $(BOARD_OUT_DIR)/$(BUILD_INFO)/libembarc.a
 else
+ifeq ($(LIB_OS_PREBUILT), 1)
 	$(CP) ./library/prebuilt_lib/libembarc_38pin_mw_os.a $(BOARD_OUT_DIR)/$(BUILD_INFO)/libembarc.a
+else
+	$(CP) ./library/prebuilt_lib/libembarc_38pin_mw.a $(BOARD_OUT_DIR)/$(BUILD_INFO)/libembarc.a
+endif
 endif
 else	
 ifeq ($(OS_TYPE), )
 	$(CP) ./library/prebuilt_lib/libembarc_38pin_gnu.a $(BOARD_OUT_DIR)/$(BUILD_INFO)/libembarc.a
 else
+ifeq ($(LIB_OS_PREBUILT), 1)
 	$(CP) ./library/prebuilt_lib/libembarc_38pin_gnu_os.a $(BOARD_OUT_DIR)/$(BUILD_INFO)/libembarc.a
+else
+	$(CP) ./library/prebuilt_lib/libembarc_38pin_gnu.a $(BOARD_OUT_DIR)/$(BUILD_INFO)/libembarc.a
+endif
 endif
 endif
 endif
@@ -480,13 +508,21 @@ ifeq ($(TOOLCHAIN), mw)
 ifeq ($(OS_TYPE), )	
 	$(CP) ./library/prebuilt_lib/libembarc_72pin_mw.a $(BOARD_OUT_DIR)/$(BUILD_INFO)/libembarc.a
 else
+ifeq ($(LIB_OS_PREBUILT), 1)
 	$(CP) ./library/prebuilt_lib/libembarc_72pin_mw_os.a $(BOARD_OUT_DIR)/$(BUILD_INFO)/libembarc.a
+else
+	$(CP) ./library/prebuilt_lib/libembarc_72pin_mw.a $(BOARD_OUT_DIR)/$(BUILD_INFO)/libembarc.a
+endif
 endif
 else	
 ifeq ($(OS_TYPE), )
 	$(CP) ./library/prebuilt_lib/libembarc_72pin_gnu.a $(BOARD_OUT_DIR)/$(BUILD_INFO)/libembarc.a
-else
+else 
+ifeq ($(LIB_OS_PREBUILT), 1)
 	$(CP) ./library/prebuilt_lib/libembarc_72pin_gnu_os.a $(BOARD_OUT_DIR)/$(BUILD_INFO)/libembarc.a
+else
+	$(CP) ./library/prebuilt_lib/libembarc_72pin_gnu.a $(BOARD_OUT_DIR)/$(BUILD_INFO)/libembarc.a
+endif
 endif	
 endif		
 endif

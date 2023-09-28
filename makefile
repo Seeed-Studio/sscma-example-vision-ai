@@ -117,6 +117,12 @@ APPL_DEFINES =
 ##
 LIB_BSP_PREBUILT = 1
 
+# USING Pre-built OS library
+# 1 for enable
+# other for disable
+##
+LIB_OS_PREBUILT = 0
+
 # USING Pre-built CV library
 # 1 for enable
 # other for disable
