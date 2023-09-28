@@ -16,10 +16,10 @@ LIB_SEL += audio
 OS_SEL = freertos
 OS_TYPE = RTOS
 
-# 100 kB
-STACKSZ = 102400
-# 512 kB
-HEAPSZ = 524288
+# 32 kB
+STACKSZ = 65536
+# 64 kB
+HEAPSZ = 65536
 
 USER_LINKER_SCRIPT_FILE = $(SCENARIO_APP_ROOT)/freertos_demo/freertos_demo.ld
 
