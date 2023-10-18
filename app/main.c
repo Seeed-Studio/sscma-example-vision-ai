@@ -1,10 +1,3 @@
-#if defined(FREERTOS_DEMO)
-#include <freertos_demo/freertos_demo.h>
+extern void app_main(void);
 
-int main(void)
-{
-	freertos_demo();
-}
-#else
-#error "Unknown APP_TYPE"
-#endif
+int main(void) { app_main(); }

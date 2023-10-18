@@ -16,6 +16,5 @@ ifneq ("$(findstring HWACCBYTPG,$(strip $(APP_TYPE)))", "")
 include $(EMBARC_ROOT)/app/hwaccautotest/hwaccautotest.mk
 endif
 
-### For Product application ####
 include $(EMBARC_ROOT)/app/scenario_app/scenario_app.mk
 

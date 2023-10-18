@@ -29,6 +29,11 @@
 #include "hx_drv_uart.h"
 #include "semphr.h"
 #include "task.h"
+#include "tensorflow/lite/micro/micro_error_reporter.h"
+#include "tensorflow/lite/micro/micro_interpreter.h"
+#include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
+#include "tensorflow/lite/micro/system_setup.h"
+#include "tensorflow/lite/schema/schema_generated.h"
 
 xSemaphoreHandle mutex;
 
@@ -44,13 +49,22 @@ static void task1(void* pvParameters) {
 static void task2(void* pvParameters) {
     while (1) {
         xSemaphoreTake(mutex, portMAX_DELAY);
-        EMBARC_PRINTF("-\r\n");
+        EMBARC_PRINTF("0x%08x\r\n", SCRATCH_MEM_Z_SIZE);
         xSemaphoreGive(mutex);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
 
 static void task3(void* pvParameters) {
+    static tflite::MicroMutableOpResolver<17> micro_op_resolver;
+    micro_op_resolver.AddConv2D();
+    micro_op_resolver.AddDepthwiseConv2D();
+    micro_op_resolver.AddReshape();
+    micro_op_resolver.AddPad();
+    micro_op_resolver.AddPadV2();
+    micro_op_resolver.AddAdd();
+    micro_op_resolver.AddSub();
+    micro_op_resolver.AddRelu();
     while (1) {
         xSemaphoreTake(mutex, portMAX_DELAY);
         uint8_t uart_buffer[32];

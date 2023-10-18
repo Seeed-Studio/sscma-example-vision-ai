@@ -23,7 +23,7 @@
 extern "C"
 {
 #endif
-    int freertos_demo(void);
+    int app_main(void);
 
 #ifdef __cplusplus
 }
