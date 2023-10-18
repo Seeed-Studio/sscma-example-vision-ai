@@ -411,8 +411,6 @@ CV_LIB_DEFINES += $(LIB_CV_DEFINES)
 CV_LIB_DEPS += $(LIB_CV_DEPS)
 CV_LIB_LIBS += $(LIB_LIB_CV)
 
-$(warning no prebuilt tflitemicro_25)
-
 $(CV_LIB): $(LIB_CV_OBJS)
 	$(TRACE_ARCHIVE)
 	$(Q)$(AR) $(AR_OPT) $@ $(LIB_CV_OBJS)
