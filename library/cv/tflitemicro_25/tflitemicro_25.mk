@@ -253,138 +253,138 @@ CV_LIB = $(OUT_DIR)/libtflitemicro_25.a
 
 LIB_INCDIR += $(LIB_CV_INCDIR)
 
-ifeq ($(TOOLCHAIN), mw)
-	ifeq ($(ALGO_TYPE), TFLITE_MICRO_HIMAX_PERSON)
-		override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_wo_audio.ld
-		ifeq (OS_FREERTOS, $(findstring OS_FREERTOS, $(OS_DEFINES)))
-			ifeq ($(ALGO_TYPE_AUDIO), CYBERON)
-				ifeq (HX_VIP_YOMO, $(findstring HX_VIP_YOMO, $(APPL_DEFINES)))
-					ifeq (HX_VIP_CDM_GRAD, $(findstring HX_VIP_CDM_GRAD, $(APPL_DEFINES)))
-						override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_w_audio_cdm.ld
-					else ifeq (HX_VIP_CDM_PIX, $(findstring HX_VIP_CDM_PIX, $(APPL_DEFINES)))
-						override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_w_audio_cdm.ld
-					else
-						override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_w_audio.ld
-					endif
-				else
-					override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_w_audio.ld
-				endif
-			else
-				ifeq (HX_VIP_YOMO, $(findstring HX_VIP_YOMO, $(APPL_DEFINES)))
-					ifeq (HX_VIP_CDM_GRAD, $(findstring HX_VIP_CDM_GRAD, $(APPL_DEFINES)))
-						override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_wo_audio_cdm.ld
-					else ifeq (HX_VIP_CDM_PIX, $(findstring HX_VIP_CDM_PIX, $(APPL_DEFINES)))
-						override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_wo_audio_cdm.ld
-					else
-						override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_wo_audio.ld
-					endif
-				else
-					override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_wo_audio.ld
-				endif
-			endif
-			ifeq (AIOT_YUNTAI_VIP, $(findstring AIOT_YUNTAI_VIP, $(APPL_DEFINES)))
-				ifeq (RESO_320x240, $(findstring RESO_320x240, $(APPL_DEFINES)))
-					override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_wo_audio_yuntai_320x240.ld
-				else ifeq (RESO_320x200, $(findstring RESO_320x200, $(APPL_DEFINES)))
-			    	override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_wo_audio_yuntai_320x200.ld
-			    endif
-			endif
+# ifeq ($(TOOLCHAIN), mw)
+# 	ifeq ($(ALGO_TYPE), TFLITE_MICRO_HIMAX_PERSON)
+# 		override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_wo_audio.ld
+# 		ifeq (OS_FREERTOS, $(findstring OS_FREERTOS, $(OS_DEFINES)))
+# 			ifeq ($(ALGO_TYPE_AUDIO), CYBERON)
+# 				ifeq (HX_VIP_YOMO, $(findstring HX_VIP_YOMO, $(APPL_DEFINES)))
+# 					ifeq (HX_VIP_CDM_GRAD, $(findstring HX_VIP_CDM_GRAD, $(APPL_DEFINES)))
+# 						override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_w_audio_cdm.ld
+# 					else ifeq (HX_VIP_CDM_PIX, $(findstring HX_VIP_CDM_PIX, $(APPL_DEFINES)))
+# 						override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_w_audio_cdm.ld
+# 					else
+# 						override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_w_audio.ld
+# 					endif
+# 				else
+# 					override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_w_audio.ld
+# 				endif
+# 			else
+# 				ifeq (HX_VIP_YOMO, $(findstring HX_VIP_YOMO, $(APPL_DEFINES)))
+# 					ifeq (HX_VIP_CDM_GRAD, $(findstring HX_VIP_CDM_GRAD, $(APPL_DEFINES)))
+# 						override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_wo_audio_cdm.ld
+# 					else ifeq (HX_VIP_CDM_PIX, $(findstring HX_VIP_CDM_PIX, $(APPL_DEFINES)))
+# 						override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_wo_audio_cdm.ld
+# 					else
+# 						override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_wo_audio.ld
+# 					endif
+# 				else
+# 					override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_wo_audio.ld
+# 				endif
+# 			endif
+# 			ifeq (AIOT_YUNTAI_VIP, $(findstring AIOT_YUNTAI_VIP, $(APPL_DEFINES)))
+# 				ifeq (RESO_320x240, $(findstring RESO_320x240, $(APPL_DEFINES)))
+# 					override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_wo_audio_yuntai_320x240.ld
+# 				else ifeq (RESO_320x200, $(findstring RESO_320x200, $(APPL_DEFINES)))
+# 			    	override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_wo_audio_yuntai_320x200.ld
+# 			    endif
+# 			endif
 
-		else
-			override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_wo_audio.ld
-			ifeq (AIOT_HGR_VIP, $(findstring AIOT_HGR_VIP, $(APPL_DEFINES)))
-			    override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_wo_audio_HGR.ld
-			endif
-			ifeq (AIOT_YUNTAI_VIP, $(findstring AIOT_YUNTAI_VIP, $(APPL_DEFINES)))
-				ifeq (RESO_320x240, $(findstring RESO_320x240, $(APPL_DEFINES)))
-					override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_wo_audio_yuntai_320x240.ld
-				else ifeq (RESO_320x200, $(findstring RESO_320x200, $(APPL_DEFINES)))
-			    	override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_wo_audio_yuntai_320x200.ld
-			    endif
-			endif
-		endif
-	else ifeq ($(ALGO_TYPE), TFLITE_MICRO_YOLO_FASTEST)
-		override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_wo_audio_yolo_fastest.ld
-	else
-		ifeq ($(ALGO_TYPE_AUDIO), CYBERON)
-			override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_w_audio.ld
-		else
-			override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_wo_audio.ld
-			ifeq (OS_TX, $(findstring OS_TX, $(OS_DEFINES)))
-				override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_tx_wo_audio.ld
-			endif			
-		endif
-	endif
-else
-	override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_gnu_tflitemicro_wo_audio.ld
-	ifeq (OS_TX, $(findstring OS_TX, $(OS_DEFINES)))
-		override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_gnu_tflitemicro_tx_wo_audio.ld
-	endif
+# 		else
+# 			override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_wo_audio.ld
+# 			ifeq (AIOT_HGR_VIP, $(findstring AIOT_HGR_VIP, $(APPL_DEFINES)))
+# 			    override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_wo_audio_HGR.ld
+# 			endif
+# 			ifeq (AIOT_YUNTAI_VIP, $(findstring AIOT_YUNTAI_VIP, $(APPL_DEFINES)))
+# 				ifeq (RESO_320x240, $(findstring RESO_320x240, $(APPL_DEFINES)))
+# 					override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_wo_audio_yuntai_320x240.ld
+# 				else ifeq (RESO_320x200, $(findstring RESO_320x200, $(APPL_DEFINES)))
+# 			    	override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_wo_audio_yuntai_320x200.ld
+# 			    endif
+# 			endif
+# 		endif
+# 	else ifeq ($(ALGO_TYPE), TFLITE_MICRO_YOLO_FASTEST)
+# 		override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_wo_audio_yolo_fastest.ld
+# 	else
+# 		ifeq ($(ALGO_TYPE_AUDIO), CYBERON)
+# 			override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_w_audio.ld
+# 		else
+# 			override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_rtos_wo_audio.ld
+# 			ifeq (OS_TX, $(findstring OS_TX, $(OS_DEFINES)))
+# 				override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_mw_tflitemicro_tx_wo_audio.ld
+# 			endif			
+# 		endif
+# 	endif
+# else
+# 	override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_gnu_tflitemicro_wo_audio.ld
+# 	ifeq (OS_TX, $(findstring OS_TX, $(OS_DEFINES)))
+# 		override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_gnu_tflitemicro_tx_wo_audio.ld
+# 	endif
 
-	ifeq ($(ALGO_TYPE), TFLITE_MICRO_YOLO_FASTEST)
-		override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_gnu_tflitemicro_wo_audio_yolo_fastest.ld
-	endif
-endif
-#APPL_DEFINES += -DTWO_BSS
+# 	ifeq ($(ALGO_TYPE), TFLITE_MICRO_YOLO_FASTEST)
+# 		override LINKER_SCRIPT_FILE := $(LIBRARIES_ROOT)/cv/himax/linker_script/linker_template_gnu_tflitemicro_wo_audio_yolo_fastest.ld
+# 	endif
+# endif
+# #APPL_DEFINES += -DTWO_BSS
 
 
-$(warning $(LINKER_SCRIPT_FILE))
-ifeq "$(HOST_OS)" "Windows"
-MLI_LIB = $(BOARD_OUT_DIR)\$(BUILD_INFO)\libmli.a
-PREBUILT_MLI_LIB = .\library\cv\tflitemicro_25\third_party\arc_mli_package\bin\himax_arcem9d_r16\release\libmli.a
-else
-MLI_LIB = $(BOARD_OUT_DIR)/$(BUILD_INFO)/libmli.a
-PREBUILT_MLI_LIB = ./library/cv/tflitemicro_25/third_party/arc_mli_package/bin/himax_arcem9d_r16/release/libmli.a
-endif
+# $(warning $(LINKER_SCRIPT_FILE))
+# ifeq "$(HOST_OS)" "Windows"
+# MLI_LIB = $(BOARD_OUT_DIR)\$(BUILD_INFO)\libmli.a
+# PREBUILT_MLI_LIB = .\library\cv\tflitemicro_25\third_party\arc_mli_package\bin\himax_arcem9d_r16\release\libmli.a
+# else
+# MLI_LIB = $(BOARD_OUT_DIR)/$(BUILD_INFO)/libmli.a
+# PREBUILT_MLI_LIB = ./library/cv/tflitemicro_25/third_party/arc_mli_package/bin/himax_arcem9d_r16/release/libmli.a
+# endif
 
-$(MLI_LIB) :
-	$(CP) $(PREBUILT_MLI_LIB) $(MLI_LIB)
+# $(MLI_LIB) :
+# 	$(CP) $(PREBUILT_MLI_LIB) $(MLI_LIB)
 
-# library generation rule
-ifeq ($(LIB_CV_PREBUILT), 1)
-ifeq "$(HOST_OS)" "Windows"
-CV_LIB = $(BOARD_OUT_DIR)\$(BUILD_INFO)\libtflitemicro_25.a
-else
-CV_LIB = $(BOARD_OUT_DIR)/$(BUILD_INFO)/libtflitemicro_25.a
-endif
-#
-ifeq "$(HOST_OS)" "Windows"
-ifeq ($(ALGO_TYPE), TFLITE_MICRO_GOOGLE_PERSON)
-CV_PREBUILT_LIB = .\library\cv\tflitemicro_25\prebuilt_lib\libtflitemicro_google_person.a
-endif
-ifeq ($(ALGO_TYPE), TFLITE_MICRO_HIMAX_PERSON)
-CV_PREBUILT_LIB = .\library\cv\himax\prebuilt_lib\libtflitemicro_25_himax_person.a
-endif
-ifeq ($(ALGO_TYPE), TFLITE_MICRO_YOLO_FASTEST)
-CV_PREBUILT_LIB = .\library\cv\tflitemicro_25\prebuilt_lib\libtflitemicro_yolo_fastest.a
-endif
-else
-ifeq ($(ALGO_TYPE), TFLITE_MICRO_GOOGLE_PERSON)
-	ifeq ($(TOOLCHAIN), mw)
-		CV_PREBUILT_LIB = ./library/cv/tflitemicro_25/prebuilt_lib/libtflitemicro_google_person.a
-	else
-		CV_PREBUILT_LIB = ./library/cv/tflitemicro_25/prebuilt_lib/libtflitemicro_google_person_gnu.a
-	endif
-endif
-ifeq ($(ALGO_TYPE), TFLITE_MICRO_HIMAX_PERSON)
-	ifeq ($(TOOLCHAIN), mw)
-		CV_PREBUILT_LIB = ./library/cv/himax/prebuilt_lib/libtflitemicro_25_himax_person.a
-	else
-		CV_PREBUILT_LIB = ./library/cv/himax/prebuilt_lib/libtflitemicro_25_himax_person_gnu.a
-	endif
-endif
-ifeq ($(ALGO_TYPE), TFLITE_MICRO_YOLO_FASTEST)
-	ifeq ($(TOOLCHAIN), mw)
-		CV_PREBUILT_LIB = ./library/cv/tflitemicro_25/prebuilt_lib/libtflitemicro_yolo_fastest.a
-	else
-		CV_PREBUILT_LIB = ./library/cv/tflitemicro_25/prebuilt_lib/libtflitemicro_yolo_fastest_gnu.a
-	endif
-endif
-endif
-$(warning $(CV_LIB)) 
-$(CV_LIB) :
-	$(CP) $(CV_PREBUILT_LIB) $(CV_LIB)
-else
+# # library generation rule
+# ifeq ($(LIB_CV_PREBUILT), 1)
+# ifeq "$(HOST_OS)" "Windows"
+# CV_LIB = $(BOARD_OUT_DIR)\$(BUILD_INFO)\libtflitemicro_25.a
+# else
+# CV_LIB = $(BOARD_OUT_DIR)/$(BUILD_INFO)/libtflitemicro_25.a
+# endif
+# #
+# ifeq "$(HOST_OS)" "Windows"
+# ifeq ($(ALGO_TYPE), TFLITE_MICRO_GOOGLE_PERSON)
+# CV_PREBUILT_LIB = .\library\cv\tflitemicro_25\prebuilt_lib\libtflitemicro_google_person.a
+# endif
+# ifeq ($(ALGO_TYPE), TFLITE_MICRO_HIMAX_PERSON)
+# CV_PREBUILT_LIB = .\library\cv\himax\prebuilt_lib\libtflitemicro_25_himax_person.a
+# endif
+# ifeq ($(ALGO_TYPE), TFLITE_MICRO_YOLO_FASTEST)
+# CV_PREBUILT_LIB = .\library\cv\tflitemicro_25\prebuilt_lib\libtflitemicro_yolo_fastest.a
+# endif
+# else
+# ifeq ($(ALGO_TYPE), TFLITE_MICRO_GOOGLE_PERSON)
+# 	ifeq ($(TOOLCHAIN), mw)
+# 		CV_PREBUILT_LIB = ./library/cv/tflitemicro_25/prebuilt_lib/libtflitemicro_google_person.a
+# 	else
+# 		CV_PREBUILT_LIB = ./library/cv/tflitemicro_25/prebuilt_lib/libtflitemicro_google_person_gnu.a
+# 	endif
+# endif
+# ifeq ($(ALGO_TYPE), TFLITE_MICRO_HIMAX_PERSON)
+# 	ifeq ($(TOOLCHAIN), mw)
+# 		CV_PREBUILT_LIB = ./library/cv/himax/prebuilt_lib/libtflitemicro_25_himax_person.a
+# 	else
+# 		CV_PREBUILT_LIB = ./library/cv/himax/prebuilt_lib/libtflitemicro_25_himax_person_gnu.a
+# 	endif
+# endif
+# ifeq ($(ALGO_TYPE), TFLITE_MICRO_YOLO_FASTEST)
+# 	ifeq ($(TOOLCHAIN), mw)
+# 		CV_PREBUILT_LIB = ./library/cv/tflitemicro_25/prebuilt_lib/libtflitemicro_yolo_fastest.a
+# 	else
+# 		CV_PREBUILT_LIB = ./library/cv/tflitemicro_25/prebuilt_lib/libtflitemicro_yolo_fastest_gnu.a
+# 	endif
+# endif
+# endif
+# $(warning $(CV_LIB)) 
+# $(CV_LIB) :
+# 	$(CP) $(CV_PREBUILT_LIB) $(CV_LIB)
+# else
 # specific compile rules
 # user can add rules to compile this middleware
 # if not rules specified to this middleware, it will use default compiling rules
@@ -416,51 +416,51 @@ $(warning no prebuilt tflitemicro_25)
 $(CV_LIB): $(LIB_CV_OBJS)
 	$(TRACE_ARCHIVE)
 	$(Q)$(AR) $(AR_OPT) $@ $(LIB_CV_OBJS)
-endif
 
-override LIB_BSS_DIR = $(LIB_CV_DIR)/bss
 
-override LIB_BSS_ASMSRCDIR	= $(LIB_BSS_DIR)
-override LIB_BSS_CSRCDIR	= $(LIB_BSS_DIR)
-override LIB_BSS_CXXSRCSDIR    = $(LIB_BSS_DIR)
-override LIB_BSS_INCDIR	= $(LIB_BSS_DIR)
+# override LIB_BSS_DIR = $(LIB_CV_DIR)/bss
 
-# find all the source files in the target directories
-override LIB_BSS_CSRCS = $(call get_csrcs, $(LIB_BSS_CSRCDIR))
-override LIB_BSS_CXXSRCS = $(call get_cxxsrcs, $(LIB_BSS_CXXSRCSDIR))
-override LIB_BSS_ASMSRCS = $(call get_asmsrcs, $(LIB_BSS_ASMSRCDIR))
+# override LIB_BSS_ASMSRCDIR	= $(LIB_BSS_DIR)
+# override LIB_BSS_CSRCDIR	= $(LIB_BSS_DIR)
+# override LIB_BSS_CXXSRCSDIR    = $(LIB_BSS_DIR)
+# override LIB_BSS_INCDIR	= $(LIB_BSS_DIR)
 
-# get object files
-override LIB_BSS_COBJS = $(call get_relobjs, $(LIB_BSS_CSRCS))
-override LIB_BSS_CXXOBJS = $(call get_relobjs, $(LIB_BSS_CXXSRCS))
-override LIB_BSS_ASMOBJS = $(call get_relobjs, $(LIB_BSS_ASMSRCS))
-override LIB_BSS_OBJS = $(LIB_BSS_COBJS) $(LIB_BSS_ASMOBJS) $(LIB_BSS_CXXOBJS)
+# # find all the source files in the target directories
+# override LIB_BSS_CSRCS = $(call get_csrcs, $(LIB_BSS_CSRCDIR))
+# override LIB_BSS_CXXSRCS = $(call get_cxxsrcs, $(LIB_BSS_CXXSRCSDIR))
+# override LIB_BSS_ASMSRCS = $(call get_asmsrcs, $(LIB_BSS_ASMSRCDIR))
 
-# get dependency files
-override LIB_BSS_DEPS = $(call get_deps, $(LIB_BSS_OBJS))
+# # get object files
+# override LIB_BSS_COBJS = $(call get_relobjs, $(LIB_BSS_CSRCS))
+# override LIB_BSS_CXXOBJS = $(call get_relobjs, $(LIB_BSS_CXXSRCS))
+# override LIB_BSS_ASMOBJS = $(call get_relobjs, $(LIB_BSS_ASMSRCS))
+# override LIB_BSS_OBJS = $(LIB_BSS_COBJS) $(LIB_BSS_ASMOBJS) $(LIB_BSS_CXXOBJS)
 
-# extra macros to be defined
-override LIB_BSS_DEFINES = -DLIB_BSS_HANDLE
+# # get dependency files
+# override LIB_BSS_DEPS = $(call get_deps, $(LIB_BSS_OBJS))
 
-# genearte library
-override BSS_LIB = $(OUT_DIR)/libbss.a
+# # extra macros to be defined
+# override LIB_BSS_DEFINES = -DLIB_BSS_HANDLE
 
-LIB_INCDIR += $(LIB_BSS_INCDIR)
+# # genearte library
+# override BSS_LIB = $(OUT_DIR)/libbss.a
 
-override BSS_LIB_CSRCDIR = $(LIB_BSS_CSRCDIR)
-override BSS_LIB_CXXSRCDIR = $(LIB_BSS_CXXSRCDIR)
-override BSS_LIB_ASMSRCDIR = $(LIB_BSS_ASMSRCDIR)
+# LIB_INCDIR += $(LIB_BSS_INCDIR)
 
-override BSS_LIB_CSRCS = $(LIB_BSS_CSRCS)
-override BSS_LIB_CXXSRCS = $(LIB_BSS_CXXSRCS)
-override BSS_LIB_ASMSRCS = $(LIB_BSS_ASMSRCS)
-override BSS_LIB_ALLSRCS = $(LIB_BSS_CSRCS) $(LIB_BSS_ASMSRCS)
+# override BSS_LIB_CSRCDIR = $(LIB_BSS_CSRCDIR)
+# override BSS_LIB_CXXSRCDIR = $(LIB_BSS_CXXSRCDIR)
+# override BSS_LIB_ASMSRCDIR = $(LIB_BSS_ASMSRCDIR)
 
-override BSS_LIB_COBJS = $(LIB_BSS_COBJS)
-override BSS_LIB_CXXOBJS = $(LIB_BSS_CXXOBJS)
-override BSS_LIB_ASMOBJS = $(LIB_BSS_ASMOBJS)
-override BSS_LIB_ALLOBJS = $(LIB_BSS_OBJS)
+# override BSS_LIB_CSRCS = $(LIB_BSS_CSRCS)
+# override BSS_LIB_CXXSRCS = $(LIB_BSS_CXXSRCS)
+# override BSS_LIB_ASMSRCS = $(LIB_BSS_ASMSRCS)
+# override BSS_LIB_ALLSRCS = $(LIB_BSS_CSRCS) $(LIB_BSS_ASMSRCS)
 
-override BSS_LIB_DEFINES = $(LIB_BSS_DEFINES)
-override BSS_LIB_DEPS = $(LIB_BSS_DEPS)
-override BSS_LIB_LIBS = $(LIB_LIB_BSS)
+# override BSS_LIB_COBJS = $(LIB_BSS_COBJS)
+# override BSS_LIB_CXXOBJS = $(LIB_BSS_CXXOBJS)
+# override BSS_LIB_ASMOBJS = $(LIB_BSS_ASMOBJS)
+# override BSS_LIB_ALLOBJS = $(LIB_BSS_OBJS)
+
+# override BSS_LIB_DEFINES = $(LIB_BSS_DEFINES)
+# override BSS_LIB_DEPS = $(LIB_BSS_DEPS)
+# override BSS_LIB_LIBS = $(LIB_LIB_BSS)
