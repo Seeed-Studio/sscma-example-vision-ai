@@ -133,7 +133,7 @@
  * 		   If you use pre-capture feature, you should consider which DMA you use for pre-capture.
  * 		      For example, pre-capture use WDMA2, WDMA3
  * 		           hx_lib_pm_pmutoallon_ready_check(0, 1, 1, 0);
- * 		2. If you need know xDMA information such as current JPEG¡@capture slot, you should store to parameter in this step.
+ * 		2. If you need know xDMA information such as current JPEGï¿½@capture slot, you should store to parameter in this step.
  * 		   After step3, xDMA information in HW registers will be reset.
  * 		    	hx_drv_xdma_get_WDMA2_loopflag(&g_jpegloop_flag);
  * 		    	hx_drv_xdma_get_WDMA2NextFrameIdx(&g_nextjpeg_frame_no);
@@ -310,6 +310,10 @@ typedef struct PM_CFG_S{
 /****************************************************
  * Function Declaration                             *
  ***************************************************/
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 /**
  * \defgroup	PWRMGMT_LIB_FUNCDLR	Power Manager library Function Declaration
  * \ingroup	PWRMGMT_LIB
@@ -475,6 +479,10 @@ PM_ERROR_E hx_lib_pm_get_slt_decreaseval(uint8_t *decrease_val);
  * \retval	others			fail
  */
 PM_ERROR_E hx_lib_pm_set_slt_decreaseval(uint8_t decrease_val);
+
+#ifdef __cplusplus
+}
+#endif
 
 
 /** @} */
