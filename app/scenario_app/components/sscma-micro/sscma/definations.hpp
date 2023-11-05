@@ -7,7 +7,7 @@
 #define REPL_EXECUTOR_PRIO       (5)
 #define REPL_HISTORY_MAX         (8)
 
-#define TENSOR_ARENA_SIZE        (1024 * 1024)
+#define TENSOR_ARENA_SIZE        (600 * 1024)
 
 #define CMD_MAX_LENGTH           (4096)
 
@@ -17,15 +17,18 @@
 
 namespace sscma::definations {
 
-using delim_f_t = std::function<void(std::string& os)>;
+// using delim_f_t = std::function<void(std::string& os)>;
 
-static delim_f_t delim_f       = [](std::string&) {};
-static delim_f_t print_delim_f = [](std::string& ss) { ss += ", "; };
-static delim_f_t print_void_f  = [](std::string&) { delim_f = print_delim_f; };
+// static delim_f_t delim_f       = [](std::string&) {};
+// static delim_f_t print_delim_f = [](std::string& ss) { ss += ", "; };
+// static delim_f_t print_void_f  = [](std::string&) { delim_f = print_delim_f; };
 
-#define DELIM_RESET \
-    { sscma::definations::delim_f = sscma::definations::print_void_f; }
-#define DELIM_PRINT(SS) \
-    { sscma::definations::delim_f(SS); }
+// #define DELIM_RESET \
+//     { sscma::definations::delim_f = sscma::definations::print_void_f; }
+// #define DELIM_PRINT(SS) \
+//     { sscma::definations::delim_f(SS); }
+
+#define DELIM_RESET
+#define DELIM_PRINT(SS)
 
 }  // namespace sscma::definations

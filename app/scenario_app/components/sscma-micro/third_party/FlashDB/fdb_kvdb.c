@@ -1557,7 +1557,7 @@ static bool check_and_recovery_kv_cb(fdb_kv_t kv, void *arg1, void *arg2)
 
     /* recovery the prepare deleted KV */
     if (kv->crc_is_ok && kv->status == FDB_KV_PRE_DELETE) {
-        FDB_INFO("Found an KV (%.*s) which has changed value failed. Now will recovery it.\n", kv->name_len, kv->name);
+        FDB_INFO("Found an KV (%s) which has changed value failed. Now will recovery it.\n", kv->name);
         /* recovery the old KV */
         if (move_kv(db, kv) == FDB_NO_ERR) {
             FDB_DEBUG("Recovery the KV successful.\n");

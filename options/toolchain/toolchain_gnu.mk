@@ -234,11 +234,11 @@ endif
 					   -mbarrel-shifter \
 					   -mfpu=fpus_all
 
-	COMMON_COMPILE_OPT += -Wnonnull -Wstringop-overflow -Walloc-zero -ffunction-sections -fdata-sections
+	COMMON_COMPILE_OPT += -Wnonnull -Wstringop-overflow -Walloc-zero -ffunction-sections -fdata-sections 
 	DEPEND_PATH = $(LIBRARIES_ROOT)/cv/mw_gnu_dependencies/gnu_depend_lib
 	GNU_DEP_LIB = $(DEPEND_PATH)/libmwdepend.a
 
 	LINK_OPT += -Wl,--print-memory-usage
-	LINK_OPT += -fstack-usage
+	LINK_OPT += -fstack-usage  
 	LINK_OPT += -Wl,-marcv2elfx -Wl,--strip-debug -Wl,--stats,--gc-sections
 

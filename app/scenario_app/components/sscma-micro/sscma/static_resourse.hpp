@@ -104,37 +104,38 @@ class StaticResourse {
     }
 
     void inter_init() {
+        //el_printf("12\n");
         transport->init();
-        instance->init([this](el_err_code_t ret, const std::string& msg) {
-            std::string ss;
-            if (ret != EL_OK) [[unlikely]] {
-                ss += concat_strings(REPLY_LOG_HEADER,
-                                     "\"name\": \"AT\", \"code\": ",
-                                     std::to_string(ret),
-                                     ", \"data\": ",
-                                     quoted(msg),
-                                     "}\n");
-                this->transport->send_bytes(ss.c_str(), ss.size());
-            }
-        });
-        models->init();
-        storage->init();
+        // instance->init([this](el_err_code_t ret, const std::string& msg) {
+        //     std::string ss;
+        //     if (ret != EL_OK) [[unlikely]] {
+        //         ss += concat_strings(REPLY_LOG_HEADER,
+        //                              "\"name\": \"AT\", \"code\": ",
+        //                              std::to_string(ret),
+        //                              ", \"data\": ",
+        //                              quoted(msg),
+        //                              "}\n");
+        //         this->transport->send_bytes(ss.c_str(), ss.size());
+        //     }
+        // });
+        // models->init();
+        //storage->init();
 
-        if (!storage->contains("edgelab") || [&]() -> bool {
-                char version[EL_VERSION_LENTH_MAX]{};
-                *storage >> el_make_storage_kv("edgelab", version);
-                return std::string(EL_VERSION) != version;
-            }()) {
-            *storage << el_make_storage_kv("edgelab", EL_VERSION)
-                     << el_make_storage_kv("current_model_id", current_model_id)
-                     << el_make_storage_kv("current_algorithm_type", current_algorithm_type)
-                     << el_make_storage_kv("current_sensor_id", current_sensor_id)
-                     << el_make_storage_kv("boot_count", boot_count);
-        }
-        *storage >> el_make_storage_kv("current_model_id", current_model_id) >>
-          el_make_storage_kv("current_algorithm_type", current_algorithm_type) >>
-          el_make_storage_kv("current_sensor_id", current_sensor_id) >> el_make_storage_kv("boot_count", boot_count);
-        *storage << el_make_storage_kv("boot_count", ++boot_count);
+        // if (!storage->contains("edgelab") || [&]() -> bool {
+        //         char version[EL_VERSION_LENTH_MAX]{};
+        //         *storage >> el_make_storage_kv("edgelab", version);
+        //         return std::string(EL_VERSION) != version;
+        //     }()) {
+        //     *storage << el_make_storage_kv("edgelab", EL_VERSION)
+        //              << el_make_storage_kv("current_model_id", current_model_id)
+        //              << el_make_storage_kv("current_algorithm_type", current_algorithm_type)
+        //              << el_make_storage_kv("current_sensor_id", current_sensor_id)
+        //              << el_make_storage_kv("boot_count", boot_count);
+        // }
+        // *storage >> el_make_storage_kv("current_model_id", current_model_id) >>
+        //   el_make_storage_kv("current_algorithm_type", current_algorithm_type) >>
+        //   el_make_storage_kv("current_sensor_id", current_sensor_id) >> el_make_storage_kv("boot_count", boot_count);
+        // *storage << el_make_storage_kv("boot_count", ++boot_count);
     }
 };
 

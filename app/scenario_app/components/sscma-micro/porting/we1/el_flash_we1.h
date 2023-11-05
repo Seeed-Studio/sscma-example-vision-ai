@@ -76,6 +76,7 @@ void el_model_partition_mmap_deinit(el_model_mmap_handler_t* mmap_handler);
     #define FDB_USING_FAL_MODE
     #define FDB_WRITE_GRAN (32)
     #define FDB_BLOCK_SIZE (8 * 1024)
+    #define FDB_PRINT(...) el_printf(__VA_ARGS__)
 
     #ifdef CONFIG_EL_DEBUG
         #define FDB_DEBUG_ENABLE

@@ -29,4 +29,39 @@
 #include "embARC_debug.h"
 #include "hx_drv_timer.h"
 
+#define I2C_SYNC_PIN          IOMUX_PGPIO0
+#define I2C_SYNC_STATE        1
+
+#define WEBUSB_SYNC_PIN       IOMUX_PGPIO8
+#define WEBUSB_SYNC_STATE     1
+
+#define DEBUGGER_ATTACH_PIN   IOMUX_PGPIO1
+#define DEBUGGER_ATTACH_STATE 1
+
+#define USE_CAMERA
+#define OV2640_CAMERA
+
+#define SENSOR_WIDTH_DEFAULT  192
+#define SENSOR_HEIGHT_DEFAULT 192
+
+#define IGNORE_FIRST_X_PICS 2
+
+//#define USE_IMU
+//#define IMU_LSM6DS3
+
+#define CMD_IMU
+#define CMD_GPIO
+
+#define CMD_READ_CRC
+#define CMD_WRITE_CRC
+
+#define CAMERA_ENABLE_PIN           IOMUX_PGPIO9
+#define CAMERA_ENABLE_STATE         1
+
+#define VISION_ROTATION             ROTATION_UP
+
+#define INTERNAL_FLASH_BASE_ADDRESS 0x00000000
+#define INTERNAL_FLASH_SIZE         0x200000  // 2MB
+#define INTERNAL_FLASH_SECTOR_SIZE  0x1000
+
 #endif

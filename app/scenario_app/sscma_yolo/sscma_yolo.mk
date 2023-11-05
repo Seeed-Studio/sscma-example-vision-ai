@@ -48,8 +48,8 @@ COMPONENT_SUPPORT_LIST +=	$(COMPONENT_ROOT)/configs \
 								$(COMPONENT_ROOT)/sscma-micro/core/utils \
 								$(COMPONENT_ROOT)/sscma-micro/porting \
 								$(COMPONENT_ROOT)/sscma-micro/porting/we1 \
-								$(COMPONENT_ROOT)/sscma-micro/porting/boards \
-								$(COMPONENT_ROOT)/sscma-micro/porting/drivers \
+								$(COMPONENT_ROOT)/sscma-micro/porting/we1/boards \
+								$(COMPONENT_ROOT)/sscma-micro/porting/we1/drivers \
 								$(COMPONENT_ROOT)/sscma-micro/sscma \
 								$(COMPONENT_ROOT)/sscma-micro/sscma/callback \
 								$(COMPONENT_ROOT)/sscma-micro/sscma/callback/internal \

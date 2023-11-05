@@ -23,11 +23,12 @@
  *
  */
 
+#include "el_device_we1.h"
+
 #include <powermode.h>
 
-#include "el_device_we1.h"
-//#include "porting/himax/el_camera_himax.h"
-#include "porting/we1/el_serial_we1.h"
+#include "el_camera_ov2640.h"
+#include "el_serial_we1.h"
 
 namespace edgelab {
 
@@ -36,15 +37,15 @@ DeviceWE1::DeviceWE1() {
     this->_device_id   = 0x0001;
     this->_revision_id = 0x0001;
 
-    // static CameraHimax camera{};
+    static CameraOV2640 camera{};
     // static SerialEsp   serial{};
 
-    // this->_camera = &camera;
+    this->_camera = &camera;
     // this->_serial = &serial;
 
-    // static uint8_t sensor_id = 0;
-    // this->_registered_sensors.emplace_front(el_sensor_info_t{
-    //   .id = ++sensor_id, .type = el_sensor_type_t::EL_SENSOR_TYPE_CAM, .state = el_sensor_state_t::EL_SENSOR_STA_REG});
+    static uint8_t sensor_id = 0;
+    this->_registered_sensors.emplace_front(el_sensor_info_t{
+      .id = ++sensor_id, .type = el_sensor_type_t::EL_SENSOR_TYPE_CAM, .state = el_sensor_state_t::EL_SENSOR_STA_REG});
 }
 
 DeviceWE1::~DeviceWE1() {}

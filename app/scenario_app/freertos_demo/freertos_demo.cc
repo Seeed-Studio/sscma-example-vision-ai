@@ -56,15 +56,6 @@ static void task2(void* pvParameters) {
 }
 
 static void task3(void* pvParameters) {
-    static tflite::MicroMutableOpResolver<17> micro_op_resolver;
-    micro_op_resolver.AddConv2D();
-    micro_op_resolver.AddDepthwiseConv2D();
-    micro_op_resolver.AddReshape();
-    micro_op_resolver.AddPad();
-    micro_op_resolver.AddPadV2();
-    micro_op_resolver.AddAdd();
-    micro_op_resolver.AddSub();
-    micro_op_resolver.AddRelu();
     while (1) {
         xSemaphoreTake(mutex, portMAX_DELAY);
         uint8_t uart_buffer[32];
@@ -75,7 +66,7 @@ static void task3(void* pvParameters) {
     }
 }
 
-int freertos_demo(void) {
+int app_main(void) {
     EMBARC_PRINTF("freertos_demo!\r\n");
 
     uint8_t uart_buffer[32];

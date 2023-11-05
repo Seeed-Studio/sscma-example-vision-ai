@@ -8,8 +8,8 @@
 MEMORY {
     ICCM0   : ORIGIN = 0x00000000, LENGTH = 0x00010000
     ICCM1   : ORIGIN = 0x10000000, LENGTH = 0x00050000
-    ROM     : ORIGIN = 0x20020800, LENGTH = 0x0008f800
-    UCHEAP  : ORIGIN = 0x200B0000, LENGTH = 0x000C0000
+    ROM     : ORIGIN = 0x20020800, LENGTH = 0x00060000
+    SYSTEM0 : ORIGIN = 0x20080800, LENGTH = 0x000EF800
     DCCM    : ORIGIN = 0x80000000, LENGTH = 0x00040000
     XCCM    : ORIGIN = 0x90000000, LENGTH = 0x00008000
     YCCM    : ORIGIN = 0xa0000000, LENGTH = 0x00008000
@@ -99,13 +99,12 @@ SECTIONS {
         PROVIDE (edata = .);
     }  > DCCM
 
-    .ucHeap :
+     .tensor_arena : ALIGN(16)
     {
-        . = ALIGN(32 / 8);
-        * (.bss.ucHeap)
-        . = ALIGN(32 / 8);
-        __SDATA_END__ = .;
-    } > UCHEAP
+        _f_bss_tensor_arena = .;
+        *(.bss.tensor_arena)
+        _e_bss_tensor_arena = .;
+    } > SYSTEM0
 
     .sbss_all           : ALIGN(4)
     {

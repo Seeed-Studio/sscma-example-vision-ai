@@ -45,6 +45,7 @@ el_err_code_t Models::init(const char* partition_name, const el_model_format_v& 
     el_err_code_t ret = el_model_partition_mmap_init(
       partition_name, &__partition_start_addr, &__partition_size, &__flash_2_memory_map, &__mmap_handler);
     if (ret != EL_OK) return ret;
+    el_printf("__flash_2_memory_map: 0x%x\n", __flash_2_memory_map);
     seek_models_from_flash(model_format);
     return ret;
 }
@@ -109,7 +110,7 @@ void Models::m_seek_plain_models_from_flash() {
     const uint8_t*           mem_addr = nullptr;
     const el_model_header_t* header   = nullptr;
     uint8_t                  model_id = 1u;
-    for (size_t it = 0u; it < __partition_size; it += sizeof(el_model_header_t)) {
+    for (size_t it = 0u; it < __partition_size; it += 1024 * 1024) {
         mem_addr = __flash_2_memory_map + it;
         header   = reinterpret_cast<const el_model_header_t*>(mem_addr);
         if (el_ntohl(header->b4[1]) != CONFIG_EL_MODEL_TFLITE_MAGIC) [[likely]]

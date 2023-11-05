@@ -38,23 +38,36 @@
 
 #define CONFIG_EL_LIB_FLASHDB
 #define CONFIG_EL_STORAGE
-#define CONFIG_EL_STORAGE_NAME                  "edgelab_db"
-#define CONFIG_EL_STORAGE_PATH                  "kvdb0"
-#define CONFIG_EL_STORAGE_PARTITION_NAME        "db"
-#define CONFIG_EL_STORAGE_PARTITION_MOUNT_POINT "nor_flash0"
-#define CONFIG_EL_STORAGE_PARTITION_FS_NAME_0   "kvdb0"
-#define CONFIG_EL_STORAGE_PARTITION_FS_SIZE_0   (64 * 1024)
-#define CONFIG_EL_STORAGE_KEY_SIZE_MAX          (64)
+#define CONFIG_EL_STORAGE_NAME                      "edgelab_db"
+#define CONFIG_EL_STORAGE_PATH                      "kvdb0"
+#define CONFIG_EL_STORAGE_PARTITION_NAME            "db"
+#define CONFIG_EL_STORAGE_PARTITION_MOUNT_POINT     "nor_flash0"
+#define CONFIG_EL_STORAGE_PARTITION_FS_NAME_0       "kvdb0"
+#define CONFIG_EL_STORAGE_PARTITION_FS_SIZE_0       (64 * 1024)
+#define CONFIG_EL_STORAGE_KEY_SIZE_MAX              (64)
 
-#define CONFIG_EL_TFLITE                        1
-#define CONFIG_EL_TFLITE_OP_PADV2               1
-// #define CONFIG_EL_TFLITE_OP_TRANSPOSE           1
-// #define CONFIG_EL_TFLITE_OP_ETHOS_U             1
-// #define CONFIG_EL_TFLITE_OP_DEQUANTIZE          1
-// #define CONFIG_EL_TFLITE_OP_QUANTIZE            1
-// #define CONFIG_EL_TFLITE_OP_FULLY_CONNECTED     1
-// #define CONFIG_EL_TFLITE_OP_GATHER              1
+#define CONFIG_EL_TFLITE                            1
+#define CONFIG_EL_TFLITE_OP_PADV2                   1
+#define CONFIG_EL_TFLITE_OP_CONV_2D                 1
+#define CONFIG_EL_TFLITE_OP_RESHAPE                 1
+#define CONFIG_EL_TFLITE_OP_PAD                     1
+#define CONFIG_EL_TFLITE_OP_SUB                     1
+#define CONFIG_EL_TFLITE_OP_ADD                     1
+#define CONFIG_EL_TFLITE_OP_RELU                    1
+#define CONFIG_EL_TFLITE_OP_SPLIT                   1
+#define CONFIG_EL_TFLITE_OP_MAX_POOL_2D             1
+#define CONFIG_EL_TFLITE_OP_CONCATENATION           1
+#define CONFIG_EL_TFLITE_OP_FULLY_CONNECTED         1
+#define CONFIG_EL_TFLITE_OP_RESIZE_NEAREST_NEIGHBOR 1
+#define CONFIG_EL_TFLITE_OP_QUANTIZE                1
+#define CONFIG_EL_TFLITE_OP_TRANSPOSE               1
+#define CONFIG_EL_TFLITE_OP_LOGISTIC                1
+#define CONFIG_EL_TFLITE_OP_MUL                     1
+#define CONFIG_EL_TFLITE_OP_SPLIT_V                 1
+#define CONFIG_EL_TFLITE_OP_MEAN                    1
+//#define CONFIG_EL_TFLITE_OP_STRIDED_SLICE           1
+#define CONFIG_EL_TFLITE_OP_SOFTMAX    1
 
-#define CONFIG_EL_HAS_FREERTOS_SUPPORT          1
+#define CONFIG_EL_HAS_FREERTOS_SUPPORT 1
 
 #endif

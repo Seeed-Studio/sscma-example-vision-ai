@@ -67,7 +67,9 @@ EL_ATTR_WEAK int el_putchar(char c) { return 0; }
 
 EL_ATTR_WEAK void* el_malloc(size_t size) {
 #ifdef CONFIG_EL_HAS_FREERTOS_SUPPORT
-    return pvPortMalloc(size);
+    void* p = pvPortMalloc(size);
+    el_printf("malloc %d bytes, addr: 0x%08x\n", size, p);
+    return p;
 #else
     return malloc(size);
 #endif
@@ -89,16 +91,30 @@ EL_ATTR_WEAK void el_free(void* ptr) {
 #endif
 }
 
-EL_ATTR_WEAK void el_reset(void) { exit(0); }
+EL_ATTR_WEAK void el_reset(void) {}
 
 EL_ATTR_WEAK void el_status_led(bool on) { xprintf("TEST LED STAT: %s", on ? "on" : "off"); }
 
 #ifdef CONFIG_EL_HAS_FREERTOS_SUPPORT
-EL_ATTR_WEAK void* operator new[](size_t size) { return pvPortMalloc(size); }
+EL_ATTR_WEAK void* operator new[](size_t size) {
+    void* p = pvPortMalloc(size);
+    el_printf("operator new[]: %d bytes, addr: 0x%08x\n", size, p);
+    return p;
+}
 
-EL_ATTR_WEAK void operator delete[](void* p) { vPortFree(p); }
+EL_ATTR_WEAK void operator delete[](void* p) {
+    el_printf("operator delete[]: addr: 0x%08x\n", p);
+    vPortFree(p);
+}
 
-EL_ATTR_WEAK void* operator new(size_t size) { return pvPortMalloc(size); }
+EL_ATTR_WEAK void* operator new(size_t size) {
+    el_printf("operator new: %d bytes\n", size);
+    void* p = pvPortMalloc(size);
+    return p;
+}
 
-EL_ATTR_WEAK void operator delete(void* p) { vPortFree(p); }
+EL_ATTR_WEAK void operator delete(void* p) {
+    el_printf("operator delete: addr: 0x%08x\n", p);
+    vPortFree(p);
+}
 #endif

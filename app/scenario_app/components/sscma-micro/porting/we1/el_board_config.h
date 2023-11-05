@@ -28,6 +28,11 @@
 
 #include "boards/boards.h"
 
+#include "hx_drv_iomux.h"
+#include "hx_drv_spi_m.h"
+#include "spi_master_protocol.h"
+
+
 
 #ifdef CONFIG_EL_HAS_FREERTOS_SUPPORT
 #include "FreeRTOS.h"

@@ -54,7 +54,6 @@ class CameraEsp : public Camera {
     framesize_t fit_resolution(size_t width, size_t height);
 
    private:
-    camera_config_t config;
     camera_fb_t*    fb;
     sensor_t*       sensor;
 };

@@ -236,8 +236,8 @@ LIB_CV_OBJS = $(LIB_CV_COBJS) $(LIB_CV_ASMOBJS) $(LIB_CV_CXXOBJS) $(LIB_CV_CCOBJ
 #CV_CCFLAGS +=  -DNDEBUG -g -DTF_LITE_STATIC_MEMORY -DEMBARC_TCF_GENERATED -Hnocopyr -O3 -Hpurge -Hcl -fslp-vectorize-aggressive -ffunction-sections -fdata-sections
 #CV_CXXFLAGS += -DSCRATCH_MEM_Z_SIZE=0x10000
 
-APPL_DEFINES += -O3 -DNDEBUG -g -DTF_LITE_STATIC_MEMORY -DEMBARC_TCF_GENERATED -O3 -ffunction-sections -fdata-sections
-APPL_DEFINES +=  -DNDEBUG -g -DTF_LITE_STATIC_MEMORY -DEMBARC_TCF_GENERATED -O3 -ffunction-sections -fdata-sections
+APPL_DEFINES += -Os -DNDEBUG -g -DTF_LITE_STATIC_MEMORY -DEMBARC_TCF_GENERATED -Os -ffunction-sections -fdata-sections
+APPL_DEFINES +=  -DNDEBUG -g -DTF_LITE_STATIC_MEMORY -DEMBARC_TCF_GENERATED -Os -ffunction-sections -fdata-sections
 ifeq ($(TOOLCHAIN), mw)
 APPL_DEFINES += -fno-rtti -Hnocopyr -Hpurge -Hcl -fslp-vectorize-aggressive
 APPL_DEFINES += -Hnocopyr -Hpurge -Hcl -fslp-vectorize-aggressive

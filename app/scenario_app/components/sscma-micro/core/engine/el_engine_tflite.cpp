@@ -376,12 +376,12 @@ el_err_code_t EngineTFLite::init(size_t size) {
 el_err_code_t EngineTFLite::init(void* pool, size_t size) {
     memory_pool.pool = pool;
     memory_pool.size = size;
+    memset(memory_pool.pool, 0, memory_pool.size);
     return init();
 }
 
 el_err_code_t EngineTFLite::run() {
     EL_ASSERT(interpreter != nullptr);
-
     if (kTfLiteOk != interpreter->Invoke()) {
         return EL_ELOG;
     }
